@@ -1,6 +1,8 @@
 %{
 #include <stdio.h>
 #include "yascm.h"
+
+void yyerror(const char *s);
 %}
 
 %union {

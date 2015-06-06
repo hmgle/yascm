@@ -24,8 +24,8 @@ CHAR_VAL (newline|space|[^{WS}])
 {WS}*	/* do nothing with white space */
 
 [-]?{DIG} {
-	// yylval.var->type = FIXNUM;
-	// yylval.var->int_val = atoi(yytext);
+	struct object_s *obj = make_fixnum(atoi(yytext));
+	yylval.var = obj;
 	return FIXNUM_T;
 }
 [-]?{DIG}?"."{DIG}	{return FLOATNUM_T;}

@@ -23,4 +23,6 @@ struct object_s {
 	} data;
 };
 
+struct object_s *make_fixnum(int64_t val);
+
 #endif
