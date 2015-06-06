@@ -1,2 +1,10 @@
 yascm
 *.o
+cscope.in.out
+cscope.out
+cscope.po.out
+tags
+
+*.tab.h
+*.tab.c
+*.lex.c
