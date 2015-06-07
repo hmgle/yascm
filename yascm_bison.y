@@ -44,10 +44,13 @@ number: FIXNUM_T {
       }
       | FLOATNUM_T {printf("float\n");}
 
+emptylist: LP RP 
+
 object: boolean		{printf("boolean\n");}
       | CHAR_T		{printf("char: %c\n", $1);}
       | string		{printf("string\n");}
       | number		{printf("number\n");}
+      | emptylist	{printf("()\n");}
 
 %%
 

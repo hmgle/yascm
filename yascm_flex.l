@@ -9,7 +9,7 @@ DIG	[0-9]+
 EOL	\n|\r\n|\n\r|\r
 WS	{EOL}|[[:blank:]]
 
-CHAR_VAL (newline|space|[^{WS}])
+CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 
 %x EXPECT_CHAR
 %x EXPECT_STRING
