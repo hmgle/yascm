@@ -10,4 +10,4 @@ yascm: yascm_flex.l yascm_bison.y yascm.h yascm.c
 	cc yascm_bison.tab.c yascm_flex.lex.c yascm.c -o $@
 
 clean::
-	-rm -f $(TARGET) *.o
+	-rm -f $(TARGET) *.o *.tab.h *.tab.c *.lex.c
