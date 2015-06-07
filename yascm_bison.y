@@ -7,18 +7,24 @@ void yyerror(const char *s);
 
 %union {
 	struct object_s *var;
+	int64_t n;
+	long double d;
+	char c;
+	char *s;
 };
 
 %token LP
 %token RP
 %token DOT
-%token FIXNUM_T
-%token FLOATNUM_T
+%token <n> FIXNUM_T
+%token <d> FLOATNUM_T
 %token FALSE_T
 %token TRUE_T
-%token CHAR_T
-%token STRING_T
+%token <c> CHAR_T
+%token <s> STRING_T
 %token DOUBLE_QUOTE
+
+%start exp
 
 %%
 
@@ -30,14 +36,16 @@ boolean: TRUE_T {printf("true\n");}
        | FALSE_T {printf("false\n");}
 
 string: DOUBLE_QUOTE
-      STRING_T {printf("string\n");}
+      STRING_T {printf("string: %s\n", $2);}
       DOUBLE_QUOTE
 
-number: FIXNUM_T {printf("fixnum\n");}
+number: FIXNUM_T {
+      printf("fixnum: %ld\n", $1); 
+      }
       | FLOATNUM_T {printf("float\n");}
 
 object: boolean		{printf("boolean\n");}
-      | CHAR_T		{printf("char\n");}
+      | CHAR_T		{printf("char: %c\n", $1);}
       | string		{printf("string\n");}
       | number		{printf("number\n");}
 

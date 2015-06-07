@@ -22,8 +22,16 @@ struct object_s *make_fixnum(int64_t val)
 	return obj;
 }
 
+void object_print(const struct object_s *obj)
+{
+	/* TODO */
+	if (obj->type == FIXNUM)
+		printf("FIXNUM: %ld\n", obj->data.int_val);
+}
+
 int main(int argc, char **argv)
 {
-	yyparse();
+	for (;;)
+		yyparse();
 	return 0;
 }

@@ -24,8 +24,7 @@ CHAR_VAL (newline|space|[^{WS}])
 {WS}*	/* do nothing with white space */
 
 [-]?{DIG} {
-	struct object_s *obj = make_fixnum(atoi(yytext));
-	yylval.var = obj;
+	yylval.n = strtoll(yytext, NULL, 10);
 	return FIXNUM_T;
 }
 [-]?{DIG}?"."{DIG}	{return FLOATNUM_T;}
@@ -33,11 +32,15 @@ CHAR_VAL (newline|space|[^{WS}])
 #\\	{BEGIN(EXPECT_CHAR);}
 <EXPECT_CHAR>{CHAR_VAL} {
 	BEGIN(INITIAL); 
+	yylval.c = *yytext;
 	return CHAR_T;
 }
 
 \"	{BEGIN(EXPECT_STRING); return DOUBLE_QUOTE;}
-<EXPECT_STRING>(\\n|\\["]|\\\\|[^\\"])* {return STRING_T;}
+<EXPECT_STRING>(\\n|\\["]|\\\\|[^\\"])* {
+	yylval.s = yytext;
+	return STRING_T;
+}
 <EXPECT_STRING>\" {BEGIN(INITIAL); return DOUBLE_QUOTE;}
 
 %%

@@ -25,4 +25,6 @@ struct object_s {
 
 struct object_s *make_fixnum(int64_t val);
 
+void object_print(const struct object_s *obj);
+
 #endif
