@@ -31,9 +31,7 @@ void object_print(const struct object_s *obj)
 
 int main(int argc, char **argv)
 {
-	for (;;) {
-		printf("> ");
-		yyparse();
-	}
+	printf("welcome\n> ");
+	yyparse();
 	return 0;
 }

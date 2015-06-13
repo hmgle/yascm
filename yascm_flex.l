@@ -8,6 +8,7 @@
 DIG	[0-9]+
 EOL	\n|\r\n|\n\r|\r
 WS	{EOL}|[[:blank:]]
+IDENT	[!$%&*+\-./:<=>?@^_~[:alnum:]]
 
 CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 
@@ -19,6 +20,7 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 "("	{return LP;}
 ")"	{return RP;}
 "."	{return DOT;}
+"'"	{return QUOTE;}
 "#f"	{return FALSE_T;}
 "#t"	{return TRUE_T;}
 {WS}*	/* do nothing with white space */
@@ -43,4 +45,5 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 }
 <EXPECT_STRING>\" {BEGIN(INITIAL); return DOUBLE_QUOTE;}
 
+{IDENT}+  { return SYMBOL; }
 %%

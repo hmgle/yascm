@@ -16,6 +16,7 @@ void yyerror(const char *s);
 %token LP
 %token RP
 %token DOT
+%token QUOTE
 %token <n> FIXNUM_T
 %token <d> FLOATNUM_T
 %token FALSE_T
@@ -23,21 +24,21 @@ void yyerror(const char *s);
 %token <c> CHAR_T
 %token <s> STRING_T
 %token DOUBLE_QUOTE
+%token SYMBOL
+
+%type <s> string
 
 %start exp
 
 %%
 
-exp: object {fprintf(stderr, "exp\n"); YYACCEPT;} exp
+exp: object {fprintf(stderr, "exp\n> ");} exp
    | /* NULL */
    ;
 
-boolean: TRUE_T {printf("true\n");}
-       | FALSE_T {printf("false\n");}
-
 string: DOUBLE_QUOTE
-      STRING_T {printf("string: %s\n", $2);}
-      DOUBLE_QUOTE
+      STRING_T
+      DOUBLE_QUOTE {$$ = $2;}
 
 number: FIXNUM_T {
       printf("fixnum: %ld\n", $1); 
@@ -46,11 +47,16 @@ number: FIXNUM_T {
 
 emptylist: LP RP 
 
-object: boolean		{printf("boolean\n");}
+quote_list: QUOTE object {printf("quote:\n");}
+
+object: TRUE_T		{printf("#t\n");}
+      | FALSE_T		{printf("#f\n");}
       | CHAR_T		{printf("char: %c\n", $1);}
-      | string		{printf("string\n");}
+      | string		{printf("string %s\n", $1);}
       | number		{printf("number\n");}
       | emptylist	{printf("()\n");}
+      | quote_list
+      | SYMBOL
 
 %%
 

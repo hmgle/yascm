@@ -10,21 +10,25 @@ typedef enum {
 	BOOL,
 	CHAR,
 	STRING,
+	PAIR,
 } object_type;
 
 struct object_s {
 	object_type type;
 	union {
-		int64_t int_val;
-		long double float_val;
-		bool bool_val;
-		char char_val;
-		char *string_val;
+		int64_t int_val; /* FIXNUM */
+		long double float_val; /* FLOATNUM */
+		bool bool_val; /* BOOL */
+		char char_val; /* CHAR */
+		char *string_val; /* STRING */
+		struct { /* PAIR */
+			struct object_s *car;
+			struct object_s *cdr;
+		};
 	} data;
 };
 
 struct object_s *make_fixnum(int64_t val);
-
 void object_print(const struct object_s *obj);
 
 #endif
