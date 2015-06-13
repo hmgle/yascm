@@ -78,24 +78,45 @@ static void add_primitive(object *env, char *name, Primitive *func)
 	add_variable(env, sym, prim);
 }
 
-static bool is_empty_list(object *obj)
-{
-	return obj == Nil;
-}
-
 static object *prim_plus(object *args_list)
 {
 	int64_t ret = 0;
-	while (!is_empty_list(args_list)) {
+	while (args_list != Nil) {
 		ret += args_list->car->int_val;
 		args_list = args_list->cdr;
 	}
 	return make_fixnum(ret);
 }
 
+static int list_length(object *list)
+{
+	int len = 0;
+	for (;;) {
+		if (list = Nil)
+			return len;
+		list = list->cdr;
+		len++;
+	}
+}
+
+static object *prim_quote(object *args_list)
+{
+	if (list_length(args_list) != 1)
+		DIE("quote");
+	return args_list->car;
+}
+
+static object *prin_define(object *args_list)
+{
+	/* TODO */
+	return NULL;
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
+	add_primitive(env, "quote", prim_quote);
+	add_primitive(env, "define", prin_define);
 }
 
 object *make_env(object *var, object *up)
