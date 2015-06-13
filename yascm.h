@@ -15,6 +15,7 @@ typedef enum {
 	ENV,
 } object_type;
 
+typedef struct object_s object;
 struct object_s {
 	object_type type;
 	union {
@@ -24,15 +25,15 @@ struct object_s {
 		char char_val; /* CHAR */
 		char *string_val; /* STRING */
 		struct { /* PAIR */
-			struct object_s *car;
-			struct object_s *cdr;
+			object *car;
+			object *cdr;
 		};
 	} data;
 };
 
-typedef struct object_s *Primitive(struct object_s *env, struct object_s *args);
+typedef object *Primitive(object *env, object *args);
 
-struct object_s *make_fixnum(int64_t val);
-void object_print(const struct object_s *obj);
+object *make_fixnum(int64_t val);
+void object_print(const object *obj);
 
 #endif
