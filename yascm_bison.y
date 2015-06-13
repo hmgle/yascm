@@ -49,6 +49,13 @@ emptylist: LP RP
 
 quote_list: QUOTE object {printf("quote:\n");}
 
+pairs_list: object
+	  | object pairs_list
+
+pairs_end: pairs_list RP
+
+pairs: LP pairs_end
+
 object: TRUE_T		{printf("#t\n");}
       | FALSE_T		{printf("#f\n");}
       | CHAR_T		{printf("char: %c\n", $1);}
@@ -57,6 +64,7 @@ object: TRUE_T		{printf("#t\n");}
       | emptylist	{printf("()\n");}
       | quote_list
       | SYMBOL
+      | pairs
 
 %%
 
