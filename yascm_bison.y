@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include "yascm.h"
 
-void yyerror(const char *s);
+void yyerror(struct object_s *env, const char *s);
 %}
+
+%parse-param {struct object_s *env}
 
 %union {
 	struct object_s *var;
@@ -36,9 +38,7 @@ exp: object {fprintf(stderr, "exp\n> ");} exp
    | /* NULL */
    ;
 
-string: DOUBLE_QUOTE
-      STRING_T
-      DOUBLE_QUOTE {$$ = $2;}
+string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
 
 number: FIXNUM_T {
       printf("fixnum: %ld\n", $1); 
@@ -62,14 +62,15 @@ object: TRUE_T		{printf("#t\n");}
       | string		{printf("string %s\n", $1);}
       | number		{printf("number\n");}
       | emptylist	{printf("()\n");}
-      | quote_list
-      | SYMBOL
-      | pairs
+      | quote_list	{printf("quote_list\n");}
+      | SYMBOL		{printf("symbol\n");}
+      | pairs		{printf("pairs\n");}
 
 %%
 
-void yyerror(const char *s)
+void yyerror(struct object_s *env, const char *s)
 {
+	(void)env;
 	fprintf(stderr, "error: %s\n", s);
 }
 

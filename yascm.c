@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "yascm.h"
 
-int yyparse(void);
+int yyparse(struct object_s *env);
 
 static struct object_s *create_object(void)
 {
@@ -31,7 +31,8 @@ void object_print(const struct object_s *obj)
 
 int main(int argc, char **argv)
 {
+	struct object_s *env;
 	printf("welcome\n> ");
-	yyparse();
+	yyparse(env);
 	return 0;
 }
