@@ -17,7 +17,7 @@ typedef enum {
 } object_type;
 
 typedef struct object_s object;
-typedef object *Primitive(object *env, object *args);
+typedef object *Primitive(object *args);
 
 struct object_s {
 	object_type type;
