@@ -33,7 +33,10 @@ static object *acons(object *x, object *y, object *a)
 	return cons(cons(x, y), a);
 }
 
-// static void add_variable(struct object_s)
+static void add_variable(object *env, object *sym, object *val)
+{
+	env->data.vars = acons(sym, val, env->data.vars);
+}
 
 object *make_fixnum(int64_t val)
 {
@@ -67,15 +70,19 @@ void object_print(const object *obj)
 		printf("FIXNUM: %ld\n", obj->data.int_val);
 }
 
-static void add_primitive(object *env, char *name, Primitive *fn)
+static void add_primitive(object *env, char *name, Primitive *func)
 {
+	object *sym = make_symbol(name);
+	object *prim = create_object(PRIM);
+	prim->data.func = func;
+	add_variable(env, sym, prim);
 }
 
 object *make_env(object *var, object *up)
 {
 	object *env = create_object(ENV);
-	env->data.car = var;
-	env->data.cdr = up;
+	env->data.vars = var;
+	env->data.up = up;
 	return env;
 }
 

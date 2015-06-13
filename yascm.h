@@ -12,10 +12,13 @@ typedef enum {
 	STRING,
 	PAIR,
 	SYMBOL,
+	PRIM,
 	ENV,
 } object_type;
 
 typedef struct object_s object;
+typedef object *Primitive(object *env, object *args);
+
 struct object_s {
 	object_type type;
 	union {
@@ -28,10 +31,13 @@ struct object_s {
 			object *car;
 			object *cdr;
 		};
+		struct { /* env frame */
+			object *vars;
+			object *up;
+		};
+		Primitive *func;
 	} data;
 };
-
-typedef object *Primitive(object *env, object *args);
 
 object *make_fixnum(int64_t val);
 void object_print(const object *obj);
