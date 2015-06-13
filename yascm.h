@@ -11,6 +11,8 @@ typedef enum {
 	CHAR,
 	STRING,
 	PAIR,
+	SYMBOL,
+	ENV,
 } object_type;
 
 struct object_s {
@@ -27,6 +29,8 @@ struct object_s {
 		};
 	} data;
 };
+
+typedef struct object_s *Primitive(struct object_s *env, struct object_s *args);
 
 struct object_s *make_fixnum(int64_t val);
 void object_print(const struct object_s *obj);

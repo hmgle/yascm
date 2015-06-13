@@ -45,5 +45,5 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 }
 <EXPECT_STRING>\" {BEGIN(INITIAL); return DOUBLE_QUOTE;}
 
-{IDENT}+  { return SYMBOL; }
+{IDENT}+  { return SYMBOL_T; }
 %%
