@@ -36,7 +36,7 @@ struct object_s {
 			object *up;
 		};
 		Primitive *func;
-	} data;
+	};
 };
 
 object *make_fixnum(int64_t val);

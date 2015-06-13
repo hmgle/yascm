@@ -22,8 +22,8 @@ static object *create_object(int type)
 static object *cons(object *car, object *cdr)
 {
 	object *pair = create_object(PAIR);
-	pair->data.car = car;
-	pair->data.cdr = cdr;
+	pair->car = car;
+	pair->cdr = cdr;
 	return pair;
 }
 
@@ -35,29 +35,29 @@ static object *acons(object *x, object *y, object *a)
 
 static void add_variable(object *env, object *sym, object *val)
 {
-	env->data.vars = acons(sym, val, env->data.vars);
+	env->vars = acons(sym, val, env->vars);
 }
 
 object *make_fixnum(int64_t val)
 {
 	object *obj = create_object(FIXNUM);
-	obj->data.int_val = val;
+	obj->int_val = val;
 	return obj;
 }
 
 object *_make_symbol(const char *name)
 {
 	object *obj = create_object(SYMBOL);
-	obj->data.string_val = strdup(name);
+	obj->string_val = strdup(name);
 	return obj;
 }
 
 object *make_symbol(const char *name)
 {
 	object *p;
-	for (p = Symbol_table; p != Nil; p = p->data.cdr)
-		if (strcmp(name, p->data.car->data.string_val) == 0)
-			return p->data.car;
+	for (p = Symbol_table; p != Nil; p = p->cdr)
+		if (strcmp(name, p->car->string_val) == 0)
+			return p->car;
 	object *sym = _make_symbol(name);
 	Symbol_table = cons(sym, Symbol_table);
 	return sym;
@@ -67,22 +67,22 @@ void object_print(const object *obj)
 {
 	/* TODO */
 	if (obj->type == FIXNUM)
-		printf("FIXNUM: %ld\n", obj->data.int_val);
+		printf("FIXNUM: %ld\n", obj->int_val);
 }
 
 static void add_primitive(object *env, char *name, Primitive *func)
 {
 	object *sym = make_symbol(name);
 	object *prim = create_object(PRIM);
-	prim->data.func = func;
+	prim->func = func;
 	add_variable(env, sym, prim);
 }
 
 object *make_env(object *var, object *up)
 {
 	object *env = create_object(ENV);
-	env->data.vars = var;
-	env->data.up = up;
+	env->vars = var;
+	env->up = up;
 	return env;
 }
 
