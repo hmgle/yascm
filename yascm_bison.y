@@ -41,7 +41,7 @@ void yyerror(struct object_s *env, const char *s);
 
 %%
 
-exp: object {fprintf(stderr, "exp\n> ");} exp
+exp: object {object_print(eval($1));} exp
    | /* NULL */
    ;
 
@@ -78,4 +78,3 @@ void yyerror(struct object_s *env, const char *s)
 	(void)env;
 	fprintf(stderr, "error: %s\n", s);
 }
-

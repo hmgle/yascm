@@ -97,11 +97,20 @@ object *make_symbol(const char *name)
 	return sym;
 }
 
+object *eval(object *obj)
+{
+	/* TODO */
+	return Nil;
+}
+
 void object_print(const object *obj)
 {
 	/* TODO */
+	if (!obj) goto end;
 	if (obj->type == FIXNUM)
 		printf("FIXNUM: %ld\n", obj->int_val);
+end:
+	printf("> ");
 }
 
 static void add_primitive(object *env, char *name, Primitive *func)
