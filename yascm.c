@@ -80,6 +80,7 @@ object *make_quote(object *obj)
 
 object *_make_symbol(const char *name)
 {
+	assert(name != NULL);
 	object *obj = create_object(SYMBOL);
 	obj->string_val = strdup(name);
 	return obj;

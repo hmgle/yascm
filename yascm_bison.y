@@ -26,7 +26,7 @@ void yyerror(struct object_s *env, const char *s);
 %token <c> CHAR_T
 %token <s> STRING_T
 %token DOUBLE_QUOTE
-%token SYMBOL_T
+%token <s> SYMBOL_T
 
 %type <s> string
 %type <var> object
@@ -65,7 +65,7 @@ object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
       | number		{$$ = make_fixnum($1); printf("number: %ld\n", $1);}
       | emptylist	{$$ = make_emptylist(); printf("()\n");}
       | quote_list	{$$ = $1; printf("quote_list\n");}
-      | SYMBOL_T	{printf("symbol\n");}
+      | SYMBOL_T	{$$ = make_symbol($1); printf("symbol\n");}
       | pairs		{printf("pairs\n");}
 
 %%
