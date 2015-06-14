@@ -125,7 +125,7 @@ static object *prim_plus(object *args_list)
 {
 	int64_t ret = 0;
 	while (args_list != Nil) {
-		ret += args_list->car->int_val;
+		ret += eval(args_list->car)->int_val;
 		args_list = args_list->cdr;
 	}
 	return make_fixnum(ret);
