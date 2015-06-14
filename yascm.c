@@ -19,7 +19,7 @@ static object *create_object(int type)
 	return obj;
 }
 
-static object *cons(object *car, object *cdr)
+object *cons(object *car, object *cdr)
 {
 	object *pair = create_object(PAIR);
 	pair->car = car;

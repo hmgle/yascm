@@ -55,6 +55,7 @@ struct object_s {
 	};
 };
 
+object *cons(object *car, object *cdr);
 object *make_bool(bool val);
 object *make_char(char val);
 object *make_string(const char *val);

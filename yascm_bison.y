@@ -33,6 +33,9 @@ void yyerror(struct object_s *env, const char *s);
 %type <n> number
 %type <var> emptylist
 %type <var> quote_list
+%type <var> pairs_list 
+%type <var> pairs_end
+%type <var> pairs
 
 %start exp
 
@@ -51,12 +54,12 @@ emptylist: LP RP
 
 quote_list: QUOTE object {$$ = make_quote($2);}
 
-pairs_list: object
-	  | object pairs_list
+pairs_list: object {$$ = $1;}
+	  | object pairs_list {$$ = cons($1, $2);}
 
-pairs_end: pairs_list RP
+pairs_end: pairs_list RP {$$ = $1;}
 
-pairs: LP pairs_end
+pairs: LP pairs_end {$$ = $2;}
 
 object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
       | FALSE_T		{$$ = make_bool(false); printf("#f\n");}
@@ -66,7 +69,7 @@ object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
       | emptylist	{$$ = make_emptylist(); printf("()\n");}
       | quote_list	{$$ = $1; printf("quote_list\n");}
       | SYMBOL_T	{$$ = make_symbol($1); printf("symbol\n");}
-      | pairs		{printf("pairs\n");}
+      | pairs		{$$ = $1; printf("pairs\n");}
 
 %%
 
