@@ -68,6 +68,11 @@ object *make_fixnum(int64_t val)
 	return obj;
 }
 
+object *make_emptylist(void)
+{
+	return Nil;
+}
+
 object *_make_symbol(const char *name)
 {
 	object *obj = create_object(SYMBOL);

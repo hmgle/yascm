@@ -15,7 +15,7 @@ void yyerror(struct object_s *env, const char *s);
 	char *s;
 };
 
-%token LP
+%token <var> LP
 %token RP
 %token DOT
 %token QUOTE
@@ -30,6 +30,8 @@ void yyerror(struct object_s *env, const char *s);
 
 %type <s> string
 %type <var> object
+%type <n> number
+%type <var> emptylist
 
 %start exp
 
@@ -42,9 +44,10 @@ exp: object {fprintf(stderr, "exp\n> ");} exp
 string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
 
 number: FIXNUM_T {
+      $$ = $1;
       printf("fixnum: %ld\n", $1); 
       }
-      | FLOATNUM_T {printf("float\n");}
+      | FLOATNUM_T {printf("float: not support now\n");}
 
 emptylist: LP RP 
 
@@ -61,8 +64,8 @@ object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
       | FALSE_T		{$$ = make_bool(false); printf("#f\n");}
       | CHAR_T		{$$ = make_char($1); printf("char: %c\n", $1);}
       | string		{$$ = make_string($1); printf("string %s\n", $1);}
-      | number		{printf("number\n");}
-      | emptylist	{printf("()\n");}
+      | number		{$$ = make_fixnum($1); printf("number\n");}
+      | emptylist	{$$ = make_emptylist(); printf("()\n");}
       | quote_list	{printf("quote_list\n");}
       | SYMBOL_T	{printf("symbol\n");}
       | pairs		{printf("pairs\n");}

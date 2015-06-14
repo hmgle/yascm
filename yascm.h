@@ -59,6 +59,7 @@ object *make_bool(bool val);
 object *make_char(char val);
 object *make_string(const char *val);
 object *make_fixnum(int64_t val);
+object *make_emptylist(void);
 void object_print(const object *obj);
 
 #endif
