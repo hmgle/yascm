@@ -38,6 +38,13 @@ static void add_variable(object *env, object *sym, object *val)
 	env->vars = acons(sym, val, env->vars);
 }
 
+object *make_bool(bool val)
+{
+	object *obj = create_object(BOOL);
+	obj->bool_val = val;
+	return obj;
+}
+
 object *make_fixnum(int64_t val)
 {
 	object *obj = create_object(FIXNUM);
