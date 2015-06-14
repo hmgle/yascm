@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #define debug_print(fmt, ...) \
 	do { \
@@ -56,6 +57,7 @@ struct object_s {
 
 object *make_bool(bool val);
 object *make_char(char val);
+object *make_string(const char *val);
 object *make_fixnum(int64_t val);
 void object_print(const object *obj);
 

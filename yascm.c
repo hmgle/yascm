@@ -52,6 +52,15 @@ object *make_char(char val)
 	return obj;
 }
 
+object *make_string(const char *val)
+{
+	object *obj = create_object(STRING);
+	obj->string_val = malloc(strlen(val) + 1);
+	assert(obj->string_val != NULL);
+	strcpy(obj->string_val, val);
+	return obj;
+}
+
 object *make_fixnum(int64_t val)
 {
 	object *obj = create_object(FIXNUM);
