@@ -73,6 +73,11 @@ object *make_emptylist(void)
 	return Nil;
 }
 
+object *make_quote(object *obj)
+{
+	return cons(make_symbol("quote"), cons(obj, Nil));
+}
+
 object *_make_symbol(const char *name)
 {
 	object *obj = create_object(SYMBOL);
