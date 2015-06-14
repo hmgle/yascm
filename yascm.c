@@ -5,7 +5,7 @@
 
 int yyparse(struct object_s *env);
 
-static object *Nil;
+object *Nil;
 static object *Symbol_table;
 
 static object *create_object(int type)
