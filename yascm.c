@@ -45,6 +45,13 @@ object *make_bool(bool val)
 	return obj;
 }
 
+object *make_char(char val)
+{
+	object *obj = create_object(CHAR);
+	obj->char_val = val;
+	return obj;
+}
+
 object *make_fixnum(int64_t val)
 {
 	object *obj = create_object(FIXNUM);

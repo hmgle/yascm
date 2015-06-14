@@ -55,6 +55,7 @@ struct object_s {
 };
 
 object *make_bool(bool val);
+object *make_char(char val);
 object *make_fixnum(int64_t val);
 void object_print(const object *obj);
 

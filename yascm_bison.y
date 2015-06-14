@@ -58,8 +58,8 @@ pairs_end: pairs_list RP
 pairs: LP pairs_end
 
 object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
-      | FALSE_T		{printf("#f\n");}
-      | CHAR_T		{printf("char: %c\n", $1);}
+      | FALSE_T		{$$ = make_bool(false); printf("#f\n");}
+      | CHAR_T		{$$ = make_char($1); printf("char: %c\n", $1);}
       | string		{printf("string %s\n", $1);}
       | number		{printf("number\n");}
       | emptylist	{printf("()\n");}
