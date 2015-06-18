@@ -33,7 +33,7 @@ typedef enum {
 } object_type;
 
 typedef struct object_s object;
-typedef object *Primitive(object *args);
+typedef object *Primitive(object *env, object *args);
 
 struct object_s {
 	object_type type;
@@ -65,7 +65,7 @@ object *make_fixnum(int64_t val);
 object *make_emptylist(void);
 object *make_symbol(const char *name);
 object *make_quote(object *obj);
-object *eval(object *obj);
+object *eval(object *env, object *obj);
 void object_print(const object *obj);
 
 #endif

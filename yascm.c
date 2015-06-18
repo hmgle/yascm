@@ -3,7 +3,7 @@
 #include <string.h>
 #include "yascm.h"
 
-int yyparse(struct object_s *env);
+int yyparse(struct object_s **env);
 
 object *Nil;
 static object *Symbol_table;
@@ -97,15 +97,28 @@ object *make_symbol(const char *name)
 	return sym;
 }
 
-object *eval(object *obj)
+object *eval(object *env, object *obj)
 {
-	/* TODO */
+	debug_print();
+	switch (obj->type) {
+	case FIXNUM:
+	case FLOATNUM:
+	case BOOL:
+	case CHAR:
+	case STRING:
+		return obj;
+	case SYMBOL:
+	default:
+		debug_print("Unknow type: %d", obj->type);
+	}
+	debug_print();
 	return Nil;
 }
 
 void object_print(const object *obj)
 {
 	/* TODO */
+	debug_print();
 	if (!obj) goto end;
 	if (obj->type == FIXNUM)
 		printf("FIXNUM: %ld\n", obj->int_val);
@@ -121,11 +134,11 @@ static void add_primitive(object *env, char *name, Primitive *func)
 	add_variable(env, sym, prim);
 }
 
-static object *prim_plus(object *args_list)
+static object *prim_plus(object *env, object *args_list)
 {
 	int64_t ret = 0;
 	while (args_list != Nil) {
-		ret += eval(args_list->car)->int_val;
+		ret += eval(env, args_list->car)->int_val;
 		args_list = args_list->cdr;
 	}
 	return make_fixnum(ret);
@@ -142,14 +155,14 @@ static int list_length(object *list)
 	}
 }
 
-static object *prim_quote(object *args_list)
+static object *prim_quote(object *env, object *args_list)
 {
 	if (list_length(args_list) != 1)
 		DIE("quote");
 	return args_list->car;
 }
 
-static object *prin_define(object *args_list)
+static object *prin_define(object *env, object *args_list)
 {
 	/* TODO */
 	return NULL;
@@ -172,9 +185,13 @@ object *make_env(object *var, object *up)
 
 int main(int argc, char **argv)
 {
-	object *env = make_env(Nil, NULL);
+	object *genv = make_env(Nil, NULL);
+	object *obj;
 	Symbol_table = Nil;
 	printf("welcome\n> ");
-	yyparse(env);
+	for (;;) {
+		yyparse(&obj);
+		object_print(eval(genv, obj));
+	}
 	return 0;
 }

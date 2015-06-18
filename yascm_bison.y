@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include "yascm.h"
 
-void yyerror(struct object_s *env, const char *s);
+void yyerror(struct object_s **obj, const char *s);
 %}
 
-%parse-param {struct object_s *env}
+%parse-param {struct object_s **obj}
 
 %union {
 	struct object_s *var;
@@ -41,9 +41,8 @@ void yyerror(struct object_s *env, const char *s);
 
 %%
 
-exp: object {object_print(eval($1));} exp
-   | /* NULL */
-   ;
+/* exp: object {object_print(eval(GENV, $1));} exp */
+exp: object {*obj = $1;}
 
 string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
 
@@ -73,8 +72,8 @@ object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
 
 %%
 
-void yyerror(struct object_s *env, const char *s)
+void yyerror(struct object_s **obj, const char *s)
 {
-	(void)env;
+	(void)obj;
 	fprintf(stderr, "error: %s\n", s);
 }
