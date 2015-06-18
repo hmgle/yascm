@@ -42,7 +42,7 @@ void yyerror(struct object_s **obj, const char *s);
 %%
 
 /* exp: object {object_print(eval(GENV, $1));} exp */
-exp: object {*obj = $1;}
+exp: object {*obj = $1; YYACCEPT;}
 
 string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
 
