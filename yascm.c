@@ -96,10 +96,22 @@ object *make_symbol(const char *name)
 	Symbol_table = cons(sym, Symbol_table);
 	return sym;
 }
+static object *lookup_variable_val(object *var, object *env)
+{
+	object *p, *cell;
+	for (p = env; p; p = p->up) {
+		for (cell = p->vars; cell != Nil; cell = cell->cdr) {
+			object *bind = cell->car;
+			if (var == bind->car)
+				return bind;
+		}
+	}
+	return NULL;
+}
 
 object *eval(object *env, object *obj)
 {
-	debug_print();
+	object *bind;
 	switch (obj->type) {
 	case FIXNUM:
 	case FLOATNUM:
@@ -108,10 +120,12 @@ object *eval(object *env, object *obj)
 	case STRING:
 		return obj;
 	case SYMBOL:
+		bind = lookup_variable_val(obj, env);
+		if (!bind)
+			DIE("not define: %s", obj->string_val);
 	default:
 		debug_print("Unknow type: %d", obj->type);
 	}
-	debug_print();
 	return Nil;
 }
 
@@ -188,6 +202,7 @@ int main(int argc, char **argv)
 	object *genv = make_env(Nil, NULL);
 	object *obj;
 	Symbol_table = Nil;
+	define_prim(genv);
 	printf("welcome\n> ");
 	for (;;) {
 		yyparse(&obj);
