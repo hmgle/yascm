@@ -113,6 +113,7 @@ object *eval(object *env, object *obj)
 {
 	/* TODO */
 	object *bind;
+	if (obj == Nil) return Nil;
 	switch (obj->type) {
 	case FIXNUM:
 	case FLOATNUM:
@@ -135,6 +136,10 @@ void object_print(const object *obj)
 {
 	/* TODO */
 	if (!obj) goto end;
+	if (obj == Nil) {
+		printf("()\n");
+		goto end;
+	}
 	switch (obj->type) {
 	case FIXNUM:
 		printf("FIXNUM: %ld\n", obj->int_val);
