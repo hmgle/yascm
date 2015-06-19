@@ -111,6 +111,7 @@ static object *lookup_variable_val(object *var, object *env)
 
 object *eval(object *env, object *obj)
 {
+	/* TODO */
 	object *bind;
 	switch (obj->type) {
 	case FIXNUM:
@@ -123,6 +124,7 @@ object *eval(object *env, object *obj)
 		bind = lookup_variable_val(obj, env);
 		if (!bind)
 			DIE("not define: %s", obj->string_val);
+		return bind->cdr;
 	default:
 		debug_print("Unknow type: %d", obj->type);
 	}
@@ -132,10 +134,15 @@ object *eval(object *env, object *obj)
 void object_print(const object *obj)
 {
 	/* TODO */
-	debug_print();
 	if (!obj) goto end;
-	if (obj->type == FIXNUM)
+	switch (obj->type) {
+	case FIXNUM:
 		printf("FIXNUM: %ld\n", obj->int_val);
+		break;
+	case PRIM:
+		printf("<primitive>\n");
+		break;
+	}
 end:
 	printf("> ");
 }
