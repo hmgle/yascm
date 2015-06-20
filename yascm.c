@@ -22,6 +22,8 @@ static object *create_object(int type)
 static void destroy_object(object *obj)
 {
 	/* TODO */
+	debug_print();
+	free(obj);
 }
 
 static object *car(object *pair)
