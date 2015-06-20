@@ -19,6 +19,11 @@ static object *create_object(int type)
 	return obj;
 }
 
+static void destroy_object(object *obj)
+{
+	/* TODO */
+}
+
 static object *car(object *pair)
 {
 	return pair->car;
@@ -258,6 +263,13 @@ static void define_variable(object *var, object *val, object *env)
 	// debug_print("var val: %ld", var->int_val);
 	debug_print("var val: %s", var->string_val);
 	debug_print("val type: %d", val->type);
+	object *oldvar = lookup_variable_val(var, env);
+	if (oldvar != NULL) {
+		debug_print();
+		destroy_object(oldvar->cdr);
+		oldvar->cdr = val;
+		return;
+	}
 	add_variable(env, var, val);
 }
 
