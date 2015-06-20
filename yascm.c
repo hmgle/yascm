@@ -166,6 +166,11 @@ void object_print(const object *obj)
 	case PRIM:
 		printf("<primitive>\n");
 		break;
+	case SYMBOL:
+		printf("%s\n", obj->string_val);
+		break;
+	default:
+		debug_print("obj type: %d", obj->type);
 	}
 end:
 	printf("> ");
