@@ -37,6 +37,8 @@ static object *cdr(object *pair)
 }
 
 #define cadr(obj)	car(cdr(obj))
+#define cdar(obj)	cdr(car(obj))
+#define caar(obj)	car(car(obj))
 #define caadr(obj)	car(car(cdr(obj)))
 #define caddr(obj)	car(cdr(cdr(obj)))
 
@@ -117,6 +119,15 @@ object *make_symbol(const char *name)
 	Symbol_table = cons(sym, Symbol_table);
 	return sym;
 }
+
+object *make_function(object *parameters, object *body)
+{
+	object *function = create_object(COMPOUND_PROC);
+	function->parameters = parameters;
+	function->body = body;
+	return function;
+}
+
 static object *lookup_variable_val(object *var, object *env)
 {
 	object *p, *cell;
@@ -242,7 +253,7 @@ static object *def_var(object *args)
 		return car(args);
 	} else { /* PAIR */
 		debug_print();
-		return caadr(args);
+		return caar(args);
 	}
 }
 
@@ -253,8 +264,9 @@ static object *def_val(object *args)
 		debug_print();
 		return cadr(args);
 	} else { /* PAIR */
-		debug_print();
-		// return make_lambda(cdadr(args), cddr(args));
+		debug_print("cdar(args) type: %d", cdar(args)->type);
+		debug_print("cadr(args) type: %d", cadr(args)->type);
+		return make_function(cdar(args), cadr(args));
 	}
 }
 
@@ -262,7 +274,6 @@ static void define_variable(object *var, object *val, object *env)
 {
 	/* TODO */
 	debug_print("var type: %d", var->type);
-	// debug_print("var val: %ld", var->int_val);
 	debug_print("var val: %s", var->string_val);
 	debug_print("val type: %d", val->type);
 	object *oldvar = lookup_variable_val(var, env);

@@ -29,6 +29,7 @@ typedef enum {
 	PAIR,
 	SYMBOL,
 	PRIM,
+	COMPOUND_PROC,
 	ENV,
 } object_type;
 
@@ -46,6 +47,10 @@ struct object_s {
 		struct { /* PAIR */
 			object *car;
 			object *cdr;
+		};
+		struct { /* COMPOUND_PROC */
+			object *parameters;
+			object *body;
 		};
 		struct { /* env frame */
 			object *vars;
@@ -65,6 +70,7 @@ object *make_fixnum(int64_t val);
 object *make_emptylist(void);
 object *make_symbol(const char *name);
 object *make_quote(object *obj);
+object *make_function(object *parameters, object *body);
 object *eval(object *env, object *obj);
 void object_print(const object *obj);
 
