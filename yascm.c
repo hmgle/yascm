@@ -114,7 +114,6 @@ static object *apply(object *env, object *fn, object *args)
 	/* TODO */
 	if (args != Nil && args->type != PAIR)
 		DIE("args must be a list");
-	debug_print();
 	if (fn->type == PRIM) {
 		return fn->func(env, args);
 	}
@@ -141,7 +140,6 @@ object *eval(object *env, object *obj)
 			DIE("not define: %s", obj->string_val);
 		return bind->cdr;
 	case PAIR:
-		debug_print();
 		fn = eval(env, obj->car);
 		args = obj->cdr;
 		if (fn->type != PRIM) DIE("must be a function!");
@@ -195,7 +193,7 @@ static int list_length(object *list)
 {
 	int len = 0;
 	for (;;) {
-		if (list = Nil)
+		if (list == Nil)
 			return len;
 		list = list->cdr;
 		len++;
@@ -204,8 +202,9 @@ static int list_length(object *list)
 
 static object *prim_quote(object *env, object *args_list)
 {
-	if (list_length(args_list) != 1)
+	if (list_length(args_list) != 1) {
 		DIE("quote");
+	}
 	return args_list->car;
 }
 
