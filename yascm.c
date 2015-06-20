@@ -19,6 +19,20 @@ static object *create_object(int type)
 	return obj;
 }
 
+static object *car(object *pair)
+{
+	return pair->car;
+}
+
+static object *cdr(object *pair)
+{
+	return pair->cdr;
+}
+
+#define cadr(obj)	car(cdr(obj))
+#define caadr(obj)	car(car(cdr(obj)))
+#define caddr(obj)	car(cdr(cdr(obj)))
+
 object *cons(object *car, object *cdr)
 {
 	object *pair = create_object(PAIR);
@@ -213,9 +227,45 @@ static object *prim_quote(object *env, object *args_list)
 	return args_list->car;
 }
 
+static object *def_var(object *args)
+{
+	debug_print("args type: %d", args->type);
+	if (args->car->type == SYMBOL) {
+		debug_print();
+		return car(args);
+	} else { /* PAIR */
+		debug_print();
+		return caadr(args);
+	}
+}
+
+static object *def_val(object *args)
+{
+	debug_print("args type: %d", args->type);
+	if (car(args)->type == SYMBOL) {
+		debug_print();
+		return cadr(args);
+	} else { /* PAIR */
+		debug_print();
+		// return make_lambda(cdadr(args), cddr(args));
+	}
+}
+
+static void define_variable(object *var, object *val, object *env)
+{
+	/* TODO */
+	debug_print("var type: %d", var->type);
+	// debug_print("var val: %ld", var->int_val);
+	debug_print("var val: %s", var->string_val);
+	debug_print("val type: %d", val->type);
+	add_variable(env, var, val);
+}
+
 static object *prim_define(object *env, object *args_list)
 {
 	/* TODO */
+	debug_print();
+	define_variable(def_var(args_list), eval(env, def_val(args_list)), env);
 	return NULL;
 }
 
