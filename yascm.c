@@ -213,7 +213,7 @@ static object *prim_quote(object *env, object *args_list)
 	return args_list->car;
 }
 
-static object *prin_define(object *env, object *args_list)
+static object *prim_define(object *env, object *args_list)
 {
 	/* TODO */
 	return NULL;
@@ -223,7 +223,7 @@ static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
 	add_primitive(env, "quote", prim_quote);
-	add_primitive(env, "define", prin_define);
+	add_primitive(env, "define", prim_define);
 }
 
 object *make_env(object *var, object *up)
