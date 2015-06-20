@@ -109,10 +109,24 @@ static object *lookup_variable_val(object *var, object *env)
 	return NULL;
 }
 
+static object *apply(object *env, object *fn, object *args)
+{
+	/* TODO */
+	if (args != Nil && args->type != PAIR)
+		DIE("args must be a list");
+	debug_print();
+	if (fn->type == PRIM) {
+		return fn->func(env, args);
+	}
+	debug_print("error");
+	return NULL;
+}
+
 object *eval(object *env, object *obj)
 {
 	/* TODO */
 	object *bind;
+	object *fn, *args;
 	if (obj == Nil) return Nil;
 	switch (obj->type) {
 	case FIXNUM:
@@ -126,6 +140,13 @@ object *eval(object *env, object *obj)
 		if (!bind)
 			DIE("not define: %s", obj->string_val);
 		return bind->cdr;
+	case PAIR:
+		debug_print();
+		fn = eval(env, obj->car);
+		args = obj->cdr;
+		if (fn->type != PRIM) DIE("must be a function!");
+		return apply(env, fn, args);
+		break;
 	default:
 		debug_print("Unknow type: %d", obj->type);
 	}
