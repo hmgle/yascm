@@ -157,7 +157,8 @@ object *extend_env(object *vars, object *vals, object *base_env)
 {
 	object *newenv = make_env(Nil, base_env);
 	while (vars != Nil && vals != Nil) {
-		add_variable(newenv, vars->car, vals->car);
+		// add_variable(newenv, vars->car, eval(newenv, vals->car));
+		add_variable(newenv, vars->car, eval(base_env, vals->car));
 		vars = vars->cdr;
 		vals = vals->cdr;
 	// add_variable(env, sym, prim);

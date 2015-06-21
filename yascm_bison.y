@@ -60,15 +60,15 @@ pairs_end: pairs_list RP {$$ = $1;}
 
 pairs: LP pairs_end {$$ = $2;}
 
-object: TRUE_T		{$$ = make_bool(true); printf("#t\n");}
-      | FALSE_T		{$$ = make_bool(false); printf("#f\n");}
-      | CHAR_T		{$$ = make_char($1); printf("char: %c\n", $1);}
-      | string		{$$ = make_string($1); printf("string: %s\n", $1);}
-      | number		{$$ = make_fixnum($1); printf("number: %ld\n", $1);}
-      | emptylist	{$$ = make_emptylist(); printf("()\n");}
-      | quote_list	{$$ = $1; printf("quote_list\n");}
-      | SYMBOL_T	{$$ = make_symbol($1); printf("symbol\n");}
-      | pairs		{$$ = $1; printf("pairs\n");}
+object: TRUE_T		{$$ = make_bool(true);}
+      | FALSE_T		{$$ = make_bool(false);}
+      | CHAR_T		{$$ = make_char($1);}
+      | string		{$$ = make_string($1);}
+      | number		{$$ = make_fixnum($1);}
+      | emptylist	{$$ = make_emptylist();}
+      | quote_list	{$$ = $1;}
+      | SYMBOL_T	{$$ = make_symbol($1);}
+      | pairs		{$$ = $1;}
 
 %%
 
