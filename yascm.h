@@ -73,6 +73,7 @@ object *make_emptylist(void);
 object *make_symbol(const char *name);
 object *make_quote(object *obj);
 object *make_function(object *parameters, object *body);
+object *make_env(object *var, object *up);
 object *eval(object *env, object *obj);
 void object_print(const object *obj);
 

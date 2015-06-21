@@ -155,7 +155,18 @@ static object *apply(object *env, object *fn, object *args)
 
 object *extend_env(object *vars, object *vals, object *base_env)
 {
-	object *newenv = create_object(ENV);
+	object *newenv = make_env(Nil, base_env);
+	while (vars != Nil && vals != Nil) {
+		add_variable(newenv, vars->car, vals->car);
+		vars = vars->cdr;
+		vals = vals->cdr;
+	// add_variable(env, sym, prim);
+	}
+	// while (args_list != Nil) {
+	// 	ret += eval(env, args_list->car)->int_val;
+	// 	args_list = args_list->cdr;
+	// }
+	// return make_fixnum(ret);
 	return newenv;
 }
 
