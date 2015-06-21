@@ -292,13 +292,19 @@ static object *def_var(object *args)
 static object *def_val(object *args)
 {
 	debug_print("args type: %d", args->type);
-	if (car(args)->type == SYMBOL) {
+	object_type type = car(args)->type;
+	if (type == SYMBOL || type == FIXNUM || type == FLOATNUM ||
+	    type == BOOL || type == CHAR || type == STRING ||
+	    type == COMPOUND_PROC) {
 		debug_print();
 		return cadr(args);
-	} else { /* PAIR */
-		debug_print("cdar(args) type: %d", cdar(args)->type);
+	} else if (type == PAIR) { /* PAIR */
+		debug_print();
+		// debug_print("cdar(args) type: %d", cdar(args)->type);
 		debug_print("cadr(args) type: %d", cadr(args)->type);
 		return make_function(cdar(args), cadr(args));
+	} else {
+		DIE("type: %d", type);
 	}
 }
 
