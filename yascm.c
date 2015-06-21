@@ -164,7 +164,7 @@ object *eval(object *env, object *obj)
 	/* TODO */
 	object *bind;
 	object *fn, *args;
-	object *newenv;
+	object *newenv, *newobj;
 	if (obj == Nil) return Nil;
 	switch (obj->type) {
 	case FIXNUM:
@@ -187,6 +187,8 @@ object *eval(object *env, object *obj)
 		} else if (fn->type == COMPOUND_PROC) {
 			debug_print();
 			newenv = extend_env(fn->parameters, args, env);
+			newobj = fn->body;
+			return eval(newenv, newobj);
 		} else {
 			DIE("not COMPOUND_PROC or PRIM");
 		}
