@@ -122,7 +122,7 @@ object *make_symbol(const char *name)
 
 object *make_function(object *parameters, object *body)
 {
-	object *function = create_object(COMPOUND_PROC);
+	object *function = create_object(LAMBDA);
 	function->parameters = parameters;
 	function->body = body;
 	return function;
@@ -174,9 +174,19 @@ object *eval(object *env, object *obj)
 	case PAIR:
 		fn = eval(env, obj->car);
 		args = obj->cdr;
-		if (fn->type != PRIM) DIE("must be a function!");
-		return apply(env, fn, args);
-		break;
+		if (fn->type == PRIM){
+			debug_print();
+			return apply(env, fn, args);
+		} else if (fn->type == COMPOUND_PROC) {
+			debug_print();
+		} else {
+			DIE("not COMPOUND_PROC or PRIM");
+		}
+	case LAMBDA:
+		debug_print();
+		obj->type = COMPOUND_PROC;
+		obj->env = env;
+		return obj;
 	default:
 		debug_print("Unknow type: %d", obj->type);
 	}

@@ -29,6 +29,7 @@ typedef enum {
 	PAIR,
 	SYMBOL,
 	PRIM,
+	LAMBDA,
 	COMPOUND_PROC,
 	ENV,
 } object_type;
@@ -48,9 +49,10 @@ struct object_s {
 			object *car;
 			object *cdr;
 		};
-		struct { /* COMPOUND_PROC */
+		struct { /* COMPOUND_PROC or LAMBDA */
 			object *parameters;
 			object *body;
+			object *env;
 		};
 		struct { /* env frame */
 			object *vars;
