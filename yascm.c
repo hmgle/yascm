@@ -153,11 +153,18 @@ static object *apply(object *env, object *fn, object *args)
 	return NULL;
 }
 
+object *extend_env(object *vars, object *vals, object *base_env)
+{
+	object *newenv = create_object(ENV);
+	return newenv;
+}
+
 object *eval(object *env, object *obj)
 {
 	/* TODO */
 	object *bind;
 	object *fn, *args;
+	object *newenv;
 	if (obj == Nil) return Nil;
 	switch (obj->type) {
 	case FIXNUM:
@@ -179,6 +186,7 @@ object *eval(object *env, object *obj)
 			return apply(env, fn, args);
 		} else if (fn->type == COMPOUND_PROC) {
 			debug_print();
+			newenv = extend_env(fn->parameters, args, env);
 		} else {
 			DIE("not COMPOUND_PROC or PRIM");
 		}
