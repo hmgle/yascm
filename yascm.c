@@ -39,6 +39,7 @@ static object *cdr(object *pair)
 #define cadr(obj)	car(cdr(obj))
 #define cdar(obj)	cdr(car(obj))
 #define caar(obj)	car(car(obj))
+#define cddr(obj)	cdr(cdr(obj))
 #define caadr(obj)	car(car(cdr(obj)))
 #define caddr(obj)	car(cdr(cdr(obj)))
 
@@ -347,12 +348,35 @@ static object *prim_set(object *env, object *args_list)
 	return NULL;
 }
 
+static bool is_false(object *obj)
+{
+	if (obj->type != BOOL)
+		return false;
+	if (obj->bool_val != false)
+		return false;
+	return true;
+}
+
+static bool is_true(object *obj)
+{
+	return !is_false(obj);
+}
+
+static object *prim_if(object *env, object *args_list)
+{
+	object *predicate = eval(env, car(args_list));
+	if (is_true(predicate))
+		return eval(env, cadr(args_list));
+	return eval(env, caddr(args_list));
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
 	add_primitive(env, "quote", prim_quote);
 	add_primitive(env, "define", prim_define);
 	add_primitive(env, "set!", prim_set);
+	add_primitive(env, "if", prim_if);
 }
 
 object *make_env(object *var, object *up)
