@@ -23,7 +23,6 @@ static object *create_object(int type)
 static void destroy_object(object *obj)
 {
 	/* TODO */
-	debug_print();
 	free(obj);
 }
 
@@ -189,10 +188,8 @@ object *eval(object *env, object *obj)
 		fn = eval(env, obj->car);
 		args = obj->cdr;
 		if (fn->type == PRIM){
-			debug_print();
 			return apply(env, fn, args);
 		} else if (fn->type == COMPOUND_PROC) {
-			debug_print();
 			newenv = extend_env(fn->parameters, args, env);
 			newobj = fn->body;
 			return eval(newenv, newobj);
@@ -200,7 +197,6 @@ object *eval(object *env, object *obj)
 			DIE("not COMPOUND_PROC or PRIM");
 		}
 	case LAMBDA:
-		debug_print();
 		obj->type = COMPOUND_PROC;
 		obj->env = env;
 		return obj;
@@ -274,22 +270,15 @@ static object *prim_quote(object *env, object *args_list)
 
 static object *def_var(object *args)
 {
-	debug_print("args type: %d", args->type);
 	if (args->car->type == SYMBOL) {
-		debug_print();
 		return car(args);
 	} else { /* PAIR */
-		debug_print();
 		return caar(args);
 	}
 }
 
 static object *def_val(object *args)
 {
-	debug_print("args type: %d", args->type);
-	// assert(car(args)->type == PAIR);
-	// debug_print("cdar(args) type: %d", cdar(args)->type);
-	debug_print("cadr(args) type: %d", cadr(args)->type);
 	if (car(args)->type == PAIR)
 		return make_function(cdar(args), cadr(args));
 	else
@@ -298,13 +287,8 @@ static object *def_val(object *args)
 
 static void define_variable(object *var, object *val, object *env)
 {
-	/* TODO */
-	debug_print("var type: %d", var->type);
-	debug_print("var val: %s", var->string_val);
-	debug_print("val type: %d", val->type);
 	object *oldvar = lookup_variable_val(var, env);
 	if (oldvar != NULL) {
-		debug_print();
 		destroy_object(oldvar->cdr);
 		oldvar->cdr = val;
 		return;
@@ -319,32 +303,27 @@ static object *set_var(object *args)
 
 static object *set_val(object *args)
 {
-	debug_print();
 	return cadr(args);
 }
 
 static void set_var_val(object *var, object *val, object *env)
 {
 	object *oldvar = lookup_variable_val(var, env);
-	debug_print();
 	if (oldvar == NULL)
 		DIE("unbound variable");
 	destroy_object(oldvar->cdr);
-	debug_print("val->type %d", val->type);
 	oldvar->cdr = val;
 }
 
 static object *prim_define(object *env, object *args_list)
 {
 	/* TODO */
-	debug_print();
 	define_variable(def_var(args_list), eval(env, def_val(args_list)), env);
 	return NULL;
 }
 
 static object *prim_set(object *env, object *args_list)
 {
-	debug_print();
 	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
 	return NULL;
 }
@@ -373,45 +352,28 @@ static object *prim_if(object *env, object *args_list)
 
 static bool is_the_last_arg(object *args)
 {
-	debug_print();
 	return (args->cdr == Nil) ? true : false;
 }
 
 static bool is_else(object *sym)
 {
 	return (sym == Else) ? true : false;
-	// debug_print();
-	// debug_print("sym->string_val: %s", sym->string_val);
-	// debug_print("sym->type: %d", sym->type);
-	// if (sym->type != SYMBOL)
-	// 	return false;
-	// if (!strcmp("else", sym->string_val))
-	// 	return true;
-	// return false;
 }
 
 static object *prim_cond(object *env, object *args_list)
 {
 	object *pairs = args_list;
 	object *predicate;
-	debug_print();
 	while (pairs != Nil) {
-		debug_print();
 		predicate = eval(env, caar(pairs));
-		debug_print();
 		if (!is_the_last_arg(pairs)) {
-			debug_print();
 			if (predicate->bool_val) {
-				debug_print();
 				return eval(env, car(cdar(pairs)));
 			}
 		} else {
-			debug_print();
 			if (is_else(predicate)) {
-				debug_print();
 				return eval(env, car(cdar(pairs)));
 			} else if (predicate->bool_val) {
-				debug_print();
 				return eval(env, car(cdar(pairs)));
 			}
 		}
