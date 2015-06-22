@@ -157,17 +157,10 @@ object *extend_env(object *vars, object *vals, object *base_env)
 {
 	object *newenv = make_env(Nil, base_env);
 	while (vars != Nil && vals != Nil) {
-		// add_variable(newenv, vars->car, eval(newenv, vals->car));
 		add_variable(newenv, vars->car, eval(base_env, vals->car));
 		vars = vars->cdr;
 		vals = vals->cdr;
-	// add_variable(env, sym, prim);
 	}
-	// while (args_list != Nil) {
-	// 	ret += eval(env, args_list->car)->int_val;
-	// 	args_list = args_list->cdr;
-	// }
-	// return make_fixnum(ret);
 	return newenv;
 }
 
@@ -292,10 +285,13 @@ static object *def_var(object *args)
 static object *def_val(object *args)
 {
 	debug_print("args type: %d", args->type);
-	assert(car(args)->type == PAIR);
+	// assert(car(args)->type == PAIR);
 	// debug_print("cdar(args) type: %d", cdar(args)->type);
 	debug_print("cadr(args) type: %d", cadr(args)->type);
-	return make_function(cdar(args), cadr(args));
+	if (car(args)->type == PAIR)
+		return make_function(cdar(args), cadr(args));
+	else
+		return cadr(args);
 }
 
 static void define_variable(object *var, object *val, object *env)
@@ -314,6 +310,28 @@ static void define_variable(object *var, object *val, object *env)
 	add_variable(env, var, val);
 }
 
+static object *set_var(object *args)
+{
+	return car(args);
+}
+
+static object *set_val(object *args)
+{
+	debug_print();
+	return cadr(args);
+}
+
+static void set_var_val(object *var, object *val, object *env)
+{
+	object *oldvar = lookup_variable_val(var, env);
+	debug_print();
+	if (oldvar == NULL)
+		DIE("unbound variable");
+	destroy_object(oldvar->cdr);
+	debug_print("val->type %d", val->type);
+	oldvar->cdr = val;
+}
+
 static object *prim_define(object *env, object *args_list)
 {
 	/* TODO */
@@ -322,11 +340,19 @@ static object *prim_define(object *env, object *args_list)
 	return NULL;
 }
 
+static object *prim_set(object *env, object *args_list)
+{
+	debug_print();
+	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
+	return NULL;
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
 	add_primitive(env, "quote", prim_quote);
 	add_primitive(env, "define", prim_define);
+	add_primitive(env, "set!", prim_set);
 }
 
 object *make_env(object *var, object *up)
