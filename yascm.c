@@ -6,6 +6,7 @@
 int yyparse(struct object_s **env);
 
 object *Nil;
+object *Else;
 static object *Symbol_table;
 
 static object *create_object(int type)
@@ -378,12 +379,15 @@ static bool is_the_last_arg(object *args)
 
 static bool is_else(object *sym)
 {
-	debug_print("sym->type: %d", sym->type);
-	if (sym->type != SYMBOL)
-		return false;
-	if (!strcmp("else", sym->string_val))
-		return true;
-	return false;
+	return (sym == Else) ? true : false;
+	// debug_print();
+	// debug_print("sym->string_val: %s", sym->string_val);
+	// debug_print("sym->type: %d", sym->type);
+	// if (sym->type != SYMBOL)
+	// 	return false;
+	// if (!strcmp("else", sym->string_val))
+	// 	return true;
+	// return false;
 }
 
 static object *prim_cond(object *env, object *args_list)
@@ -396,9 +400,13 @@ static object *prim_cond(object *env, object *args_list)
 		predicate = eval(env, caar(pairs));
 		debug_print();
 		if (!is_the_last_arg(pairs)) {
-			if (predicate->bool_val)
-				return eval(env, cdar(pairs));
+			debug_print();
+			if (predicate->bool_val) {
+				debug_print();
+				return eval(env, car(cdar(pairs)));
+			}
 		} else {
+			debug_print();
 			if (is_else(predicate)) {
 				debug_print();
 				return eval(env, car(cdar(pairs)));
@@ -436,6 +444,7 @@ int main(int argc, char **argv)
 	object *obj;
 	Symbol_table = Nil;
 	define_prim(genv);
+	add_variable(genv, make_symbol("else"), Else);
 	printf("welcome\n> ");
 	for (;;) {
 		yyparse(&obj);
