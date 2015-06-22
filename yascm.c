@@ -370,6 +370,48 @@ static object *prim_if(object *env, object *args_list)
 	return eval(env, caddr(args_list));
 }
 
+static bool is_the_last_arg(object *args)
+{
+	debug_print();
+	return (args->cdr == Nil) ? true : false;
+}
+
+static bool is_else(object *sym)
+{
+	debug_print("sym->type: %d", sym->type);
+	if (sym->type != SYMBOL)
+		return false;
+	if (!strcmp("else", sym->string_val))
+		return true;
+	return false;
+}
+
+static object *prim_cond(object *env, object *args_list)
+{
+	object *pairs = args_list;
+	object *predicate;
+	debug_print();
+	while (pairs != Nil) {
+		debug_print();
+		predicate = eval(env, caar(pairs));
+		debug_print();
+		if (!is_the_last_arg(pairs)) {
+			if (predicate->bool_val)
+				return eval(env, cdar(pairs));
+		} else {
+			if (is_else(predicate)) {
+				debug_print();
+				return eval(env, car(cdar(pairs)));
+			} else if (predicate->bool_val) {
+				debug_print();
+				return eval(env, car(cdar(pairs)));
+			}
+		}
+		pairs = pairs->cdr;
+	}
+	DIE("cond error exp!");
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
@@ -377,6 +419,7 @@ static void define_prim(object *env)
 	add_primitive(env, "define", prim_define);
 	add_primitive(env, "set!", prim_set);
 	add_primitive(env, "if", prim_if);
+	add_primitive(env, "cond", prim_cond);
 }
 
 object *make_env(object *var, object *up)

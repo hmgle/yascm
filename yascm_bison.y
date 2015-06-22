@@ -53,7 +53,7 @@ emptylist: LP RP
 
 quote_list: QUOTE object {$$ = make_quote($2);}
 
-pairs_list: object {$$ = cons($1, Nil);}
+pairs_list: object {$$ = cons($1, make_emptylist());}
 	  | object pairs_list {$$ = cons($1, $2);}
 
 pairs_end: pairs_list RP {$$ = $1;}

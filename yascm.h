@@ -62,8 +62,6 @@ struct object_s {
 	};
 };
 
-extern object *Nil;
-
 object *cons(object *car, object *cdr);
 object *make_bool(bool val);
 object *make_char(char val);
