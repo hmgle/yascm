@@ -221,6 +221,9 @@ void object_print(const object *obj)
 	case PRIM:
 		printf("<primitive>\n");
 		break;
+	case BOOL:
+		printf("#%c\n", obj->bool_val ? 't' : 'f');
+		break;
 	case SYMBOL:
 		printf("%s\n", obj->string_val);
 		break;
@@ -382,6 +385,17 @@ static object *prim_cond(object *env, object *args_list)
 	DIE("cond error exp!");
 }
 
+static object *prim_is_num_eq(object *env, object *args_list)
+{
+	int64_t first = eval(env, args_list->car)->int_val;
+	while (args_list != Nil) {
+		if (eval(env, args_list->car)->int_val != first)
+			return make_bool(false);
+		args_list = args_list->cdr;
+	}
+	return make_bool(true);
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
@@ -390,6 +404,7 @@ static void define_prim(object *env)
 	add_primitive(env, "set!", prim_set);
 	add_primitive(env, "if", prim_if);
 	add_primitive(env, "cond", prim_cond);
+	add_primitive(env, "=", prim_is_num_eq);
 }
 
 object *make_env(object *var, object *up)
