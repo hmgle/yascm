@@ -435,6 +435,21 @@ static object *prim_is_num_eq(object *env, object *args_list)
 	return make_bool(true);
 }
 
+static object *prim_is_num_gt(object *env, object *args_list)
+{
+	int64_t next;
+	int64_t first = eval(env, args_list->car)->int_val;
+	args_list = args_list->cdr;
+	while (args_list != Nil) {
+		next = eval(env, args_list->car)->int_val;
+		if (next >= first)
+			return make_bool(false);
+		first = next;
+		args_list = args_list->cdr;
+	}
+	return make_bool(true);
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "+", prim_plus);
@@ -446,6 +461,7 @@ static void define_prim(object *env)
 	add_primitive(env, "cond", prim_cond);
 	add_primitive(env, "eq?", prim_is_eq);
 	add_primitive(env, "=", prim_is_num_eq);
+	add_primitive(env, ">", prim_is_num_gt);
 }
 
 object *make_env(object *var, object *up)
