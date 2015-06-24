@@ -385,6 +385,40 @@ static object *prim_cond(object *env, object *args_list)
 	DIE("cond error exp!");
 }
 
+static object *prim_is_eq(object *env, object *args_list)
+{
+	object *obj;
+	object *first = eval(env, args_list->car);
+	while (args_list != Nil) {
+		obj = eval(env, args_list->car);
+		if (obj->type != first->type)
+			return make_bool(false);
+		switch (first->type) {
+		case FIXNUM:
+			if (obj->int_val != first->int_val)
+				return make_bool(false);
+			break;
+		case BOOL:
+			if (obj->bool_val != first->bool_val)
+				return make_bool(false);
+			break;
+		case CHAR:
+			if (obj->char_val != first->char_val)
+				return make_bool(false);
+			break;
+		case STRING:
+			if (strcmp(obj->string_val, first->string_val))
+				return make_bool(false);
+			break;
+		default:
+			if (obj != first)
+				return make_bool(false);
+		}
+		args_list = args_list->cdr;
+	}
+	return make_bool(true);
+}
+
 static object *prim_is_num_eq(object *env, object *args_list)
 {
 	int64_t first = eval(env, args_list->car)->int_val;
@@ -404,6 +438,7 @@ static void define_prim(object *env)
 	add_primitive(env, "set!", prim_set);
 	add_primitive(env, "if", prim_if);
 	add_primitive(env, "cond", prim_cond);
+	add_primitive(env, "eq?", prim_is_eq);
 	add_primitive(env, "=", prim_is_num_eq);
 }
 
