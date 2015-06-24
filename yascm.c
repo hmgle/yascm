@@ -325,6 +325,11 @@ static object *prim_define(object *env, object *args_list)
 	return NULL;
 }
 
+static object *prim_lambda(object *env, object *args_list)
+{
+	return eval(env, make_function(car(args_list), cadr(args_list)));
+}
+
 static object *prim_set(object *env, object *args_list)
 {
 	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
@@ -435,6 +440,7 @@ static void define_prim(object *env)
 	add_primitive(env, "+", prim_plus);
 	add_primitive(env, "quote", prim_quote);
 	add_primitive(env, "define", prim_define);
+	add_primitive(env, "lambda", prim_lambda);
 	add_primitive(env, "set!", prim_set);
 	add_primitive(env, "if", prim_if);
 	add_primitive(env, "cond", prim_cond);
