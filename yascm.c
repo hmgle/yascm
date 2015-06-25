@@ -7,6 +7,7 @@ int yyparse(struct object_s **env);
 
 object *Nil;
 object *Else;
+object *Ok;
 static object *Symbol_table;
 
 static object *create_object(int type)
@@ -165,9 +166,11 @@ object *extend_env(object *vars, object *vals, object *base_env)
 	return newenv;
 }
 
+static bool is_the_last_arg(object *args);
 object *eval(object *env, object *obj)
 {
 	/* TODO */
+	debug_print();
 	object *bind;
 	object *fn, *args;
 	object *newenv, *newobj;
@@ -178,6 +181,7 @@ object *eval(object *env, object *obj)
 	case BOOL:
 	case CHAR:
 	case STRING:
+	case OTHER:
 		return obj;
 	case SYMBOL:
 		bind = lookup_variable_val(obj, env);
@@ -192,9 +196,14 @@ object *eval(object *env, object *obj)
 		} else if (fn->type == COMPOUND_PROC) {
 			newenv = extend_env(fn->parameters, args, env);
 			newobj = fn->body;
-			return eval(newenv, newobj);
+			debug_print("newobj->type: %d", newobj->type);
+			while (!is_the_last_arg(newobj)) {
+				(void)eval(newenv, newobj->car);
+				newobj = newobj->cdr;
+			}
+			return eval(newenv, newobj->car);
 		} else {
-			DIE("not COMPOUND_PROC or PRIM");
+			DIE("not COMPOUND_PROC or PRIM: %d", fn->type);
 		}
 	case LAMBDA:
 		obj->type = COMPOUND_PROC;
@@ -209,7 +218,10 @@ object *eval(object *env, object *obj)
 void object_print(const object *obj)
 {
 	/* TODO */
-	if (!obj) goto end;
+	if (!obj) {
+		debug_print();
+		goto end;
+	}
 	if (obj == Nil) {
 		printf("()\n");
 		goto end;
@@ -283,7 +295,7 @@ static object *def_var(object *args)
 static object *def_val(object *args)
 {
 	if (car(args)->type == PAIR)
-		return make_function(cdar(args), cadr(args));
+		return make_function(cdar(args), cdr(args));
 	else
 		return cadr(args);
 }
@@ -322,7 +334,7 @@ static object *prim_define(object *env, object *args_list)
 {
 	/* TODO */
 	define_variable(def_var(args_list), eval(env, def_val(args_list)), env);
-	return NULL;
+	return Ok;
 }
 
 static object *prim_lambda(object *env, object *args_list)
@@ -333,7 +345,7 @@ static object *prim_lambda(object *env, object *args_list)
 static object *prim_set(object *env, object *args_list)
 {
 	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
-	return NULL;
+	return Ok;
 }
 
 static bool is_false(object *obj)
@@ -474,6 +486,9 @@ object *make_env(object *var, object *up)
 
 int main(int argc, char **argv)
 {
+	Nil = create_object(OTHER);
+	Else = create_object(OTHER);
+	Ok = create_object(OTHER);
 	object *genv = make_env(Nil, NULL);
 	object *obj;
 	Symbol_table = Nil;

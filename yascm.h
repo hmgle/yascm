@@ -32,6 +32,7 @@ typedef enum {
 	LAMBDA,
 	COMPOUND_PROC,
 	ENV,
+	OTHER,
 } object_type;
 
 typedef struct object_s object;
