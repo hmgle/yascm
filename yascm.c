@@ -60,6 +60,7 @@ static object *acons(object *x, object *y, object *a)
 
 static void add_variable(object *env, object *sym, object *val)
 {
+	debug_print("sym: %s, val: %ld", sym->string_val, val->int_val);
 	env->vars = acons(sym, val, env->vars);
 }
 
@@ -159,10 +160,12 @@ object *extend_env(object *vars, object *vals, object *base_env)
 {
 	object *newenv = make_env(Nil, base_env);
 	while (vars != Nil && vals != Nil) {
+		debug_print("vars->string_val: %s", vars->car->string_val);
 		add_variable(newenv, vars->car, eval(base_env, vals->car));
 		vars = vars->cdr;
 		vals = vals->cdr;
 	}
+	debug_print("newenv: %#x", newenv);
 	return newenv;
 }
 
@@ -194,7 +197,7 @@ object *eval(object *env, object *obj)
 		if (fn->type == PRIM){
 			return apply(env, fn, args);
 		} else if (fn->type == COMPOUND_PROC) {
-			newenv = extend_env(fn->parameters, args, env);
+			newenv = extend_env(fn->parameters, args, fn->env);
 			newobj = fn->body;
 			debug_print("newobj->type: %d", newobj->type);
 			while (!is_the_last_arg(newobj)) {
@@ -238,6 +241,9 @@ void object_print(const object *obj)
 		break;
 	case SYMBOL:
 		printf("%s\n", obj->string_val);
+		break;
+	case COMPOUND_PROC:
+		printf("proc->env %#x\n", obj->env);
 		break;
 	default:
 		debug_print("obj type: %d", obj->type);
@@ -339,6 +345,8 @@ static object *prim_define(object *env, object *args_list)
 
 static object *prim_lambda(object *env, object *args_list)
 {
+	debug_print();
+	// return eval(env, make_function(car(args_list), cdr(args_list)));
 	return eval(env, make_function(car(args_list), cdr(args_list)));
 }
 
