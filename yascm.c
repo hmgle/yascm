@@ -339,7 +339,7 @@ static object *prim_define(object *env, object *args_list)
 
 static object *prim_lambda(object *env, object *args_list)
 {
-	return eval(env, make_function(car(args_list), cadr(args_list)));
+	return eval(env, make_function(car(args_list), cdr(args_list)));
 }
 
 static object *prim_set(object *env, object *args_list)
