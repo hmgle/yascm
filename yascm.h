@@ -14,9 +14,7 @@
 
 #define DIE(fmt, ...) \
 	do { \
-		fprintf(stderr, "debug_print: %s: %d: %s():" \
-			fmt "\n", __FILE__, __LINE__, __func__, \
-			##__VA_ARGS__); \
+		debug_print(fmt, ##__VA_ARGS__); \
 		exit(-1); \
 	} while (0)
 

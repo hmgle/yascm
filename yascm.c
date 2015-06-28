@@ -222,7 +222,7 @@ void object_print(const object *obj)
 		goto end;
 	switch (obj->type) {
 	case FIXNUM:
-		printf("FIXNUM: %ld\n", obj->int_val);
+		printf("%ld\n", obj->int_val);
 		break;
 	case PRIM:
 		printf("<primitive>\n");

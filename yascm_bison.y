@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include "yascm.h"
 
 void yyerror(struct object_s **obj, const char *s);
@@ -75,5 +76,5 @@ object: TRUE_T		{$$ = make_bool(true);}
 void yyerror(struct object_s **obj, const char *s)
 {
 	(void)obj;
-	fprintf(stderr, "error: %s\n", s);
+	exit(0);
 }
