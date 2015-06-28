@@ -224,12 +224,19 @@ void object_print(const object *obj)
 	case FIXNUM:
 		printf("%ld\n", obj->int_val);
 		break;
+	case KEYWORD:
+		printf("<keywork>\n");
+		break;
 	case PRIM:
 		printf("<primitive>\n");
 		break;
 	case BOOL:
 		printf("#%c\n", obj->bool_val ? 't' : 'f');
 		break;
+	case CHAR:
+		printf("#\\%c\n", obj->char_val);
+		break;
+	case STRING:
 	case SYMBOL:
 		printf("%s\n", obj->string_val);
 		break;
