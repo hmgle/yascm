@@ -247,7 +247,7 @@ void object_print(const object *obj)
 		if (obj == Nil)
 			printf("()\n");
 		else if (obj == Ok)
-			printf("; ok\n");
+			fprintf(stderr, "; ok\n");
 		else
 			printf("type: %d\n", obj->type);
 	}
