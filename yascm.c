@@ -218,13 +218,8 @@ object *eval(object *env, object *obj)
 
 void object_print(const object *obj)
 {
-	/* TODO */
 	if (!obj)
 		goto end;
-	if (obj == Nil) {
-		printf("()\n");
-		goto end;
-	}
 	switch (obj->type) {
 	case FIXNUM:
 		printf("FIXNUM: %ld\n", obj->int_val);
@@ -242,7 +237,12 @@ void object_print(const object *obj)
 		printf("<proc>\n");
 		break;
 	default:
-		debug_print("obj type: %d", obj->type);
+		if (obj == Nil)
+			printf("()\n");
+		else if (obj == Ok)
+			printf("; ok\n");
+		else
+			printf("type: %d\n", obj->type);
 	}
 end:
 	printf("> ");
