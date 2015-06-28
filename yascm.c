@@ -60,6 +60,7 @@ static object *acons(object *x, object *y, object *a)
 
 static void add_variable(object *env, object *sym, object *val)
 {
+	debug_print("val-type: %d", val->type);
 	debug_print("sym: %s, val: %ld", sym->string_val, val->int_val);
 	env->vars = acons(sym, val, env->vars);
 }
@@ -199,6 +200,7 @@ object *eval(object *env, object *obj)
 	case CHAR:
 	case STRING:
 	case OTHER:
+	case COMPOUND_PROC:
 		return obj;
 	case SYMBOL:
 		bind = lookup_variable_val(obj, env);
@@ -317,9 +319,10 @@ static object *def_var(object *args)
 
 static object *def_val(object *args, object *env)
 {
-	if (car(args)->type == PAIR)
+	if (car(args)->type == PAIR) {
+		debug_print();
 		return make_function(cdar(args), cdr(args), env);
-	else
+	} else
 		return eval(env, cadr(args));
 }
 
