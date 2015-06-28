@@ -28,8 +28,8 @@ typedef enum {
 	STRING,
 	PAIR,
 	SYMBOL,
+	KEYWORD,
 	PRIM,
-	LAMBDA,
 	COMPOUND_PROC,
 	ENV,
 	OTHER,
@@ -50,7 +50,7 @@ struct object_s {
 			object *car;
 			object *cdr;
 		};
-		struct { /* COMPOUND_PROC or LAMBDA */
+		struct { /* COMPOUND_PROC */
 			object *parameters;
 			object *body;
 			object *env;
@@ -71,7 +71,7 @@ object *make_fixnum(int64_t val);
 object *make_emptylist(void);
 object *make_symbol(const char *name);
 object *make_quote(object *obj);
-object *make_function(object *parameters, object *body);
+object *make_function(object *parameters, object *body, object *env);
 object *make_env(object *var, object *up);
 object *eval(object *env, object *obj);
 void object_print(const object *obj);
