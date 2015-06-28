@@ -24,7 +24,6 @@ static object *create_object(int type)
 static void destroy_object(object *obj)
 {
 	/* TODO */
-	// free(obj);
 }
 
 static object *car(object *pair)
@@ -60,8 +59,6 @@ static object *acons(object *x, object *y, object *a)
 
 static void add_variable(object *env, object *sym, object *val)
 {
-	debug_print("val-type: %d", val->type);
-	debug_print("sym: %s, val: %ld", sym->string_val, val->int_val);
 	env->vars = acons(sym, val, env->vars);
 }
 
@@ -126,7 +123,6 @@ object *make_symbol(const char *name)
 
 object *make_function(object *parameters, object *body, object *env)
 {
-	debug_print();
 	object *function = create_object(COMPOUND_PROC);
 	function->parameters = parameters;
 	function->body = body;
@@ -156,7 +152,6 @@ static object *list_of_val(object *args, object *env)
 
 static object *apply(object *env, object *fn, object *args)
 {
-	/* TODO */
 	object *eval_args;
 	if (args != Nil && args->type != PAIR)
 		DIE("args must be a list");
@@ -164,7 +159,6 @@ static object *apply(object *env, object *fn, object *args)
 		eval_args = list_of_val(args, env);
 		return fn->func(env, eval_args);
 	} else if (fn->type == KEYWORD) {
-		debug_print();
 		return fn->func(env, args);
 	}
 	debug_print("error");
@@ -175,19 +169,16 @@ object *extend_env(object *vars, object *vals, object *base_env)
 {
 	object *newenv = make_env(Nil, base_env);
 	while (vars != Nil && vals != Nil) {
-		debug_print("vars->string_val: %s", vars->car->string_val);
 		add_variable(newenv, vars->car, eval(base_env, vals->car));
 		vars = vars->cdr;
 		vals = vals->cdr;
 	}
-	// debug_print("newenv: %#x", newenv);
 	return newenv;
 }
 
 static bool is_the_last_arg(object *args);
 object *eval(object *env, object *obj)
 {
-	/* TODO */
 	object *bind;
 	object *fn, *args;
 	object *newenv, *newobj;
@@ -210,19 +201,14 @@ object *eval(object *env, object *obj)
 	case PAIR:
 		fn = eval(env, obj->car);
 		args = obj->cdr;
-		debug_print("fn->type: %d", fn->type);
 		if (fn->type == PRIM || fn->type == KEYWORD) {
 			return apply(env, fn, args);
 		} else if (fn->type == COMPOUND_PROC) {
-			debug_print();
 			eval_args = list_of_val(args, env);
-			// newenv = extend_env(fn->parameters, args, fn->env);
 			newenv = extend_env(fn->parameters, eval_args, fn->env);
 			newobj = fn->body;
-			debug_print("newobj->type: %d", newobj->type);
 			while (!is_the_last_arg(newobj)) {
 				(void)eval(newenv, newobj->car);
-				debug_print("not is_the_last_arg");
 				newobj = newobj->cdr;
 			}
 			return eval(newenv, newobj->car);
@@ -238,10 +224,8 @@ object *eval(object *env, object *obj)
 void object_print(const object *obj)
 {
 	/* TODO */
-	if (!obj) {
-		debug_print();
+	if (!obj)
 		goto end;
-	}
 	if (obj == Nil) {
 		printf("()\n");
 		goto end;
@@ -260,7 +244,7 @@ void object_print(const object *obj)
 		printf("%s\n", obj->string_val);
 		break;
 	case COMPOUND_PROC:
-		printf("proc->env %#x\n", obj->env);
+		printf("<proc>\n");
 		break;
 	default:
 		debug_print("obj type: %d", obj->type);
@@ -281,7 +265,6 @@ static void add_primitive(object *env, char *name, Primitive *func,
 static object *prim_plus(object *env, object *args_list)
 {
 	int64_t ret = 0;
-	debug_print();
 	while (args_list != Nil) {
 		ret += (car(args_list)->int_val);
 		args_list = args_list->cdr;
@@ -319,10 +302,9 @@ static object *def_var(object *args)
 
 static object *def_val(object *args, object *env)
 {
-	if (car(args)->type == PAIR) {
-		debug_print();
+	if (car(args)->type == PAIR)
 		return make_function(cdar(args), cdr(args), env);
-	} else
+	else
 		return eval(env, cadr(args));
 }
 
@@ -358,21 +340,17 @@ static void set_var_val(object *var, object *val, object *env)
 
 static object *prim_define(object *env, object *args_list)
 {
-	debug_print();
 	define_variable(def_var(args_list), def_val(args_list, env), env);
 	return Ok;
 }
 
 static object *prim_lambda(object *env, object *args_list)
 {
-	debug_print();
-	// return eval(env, make_function(car(args_list), cdr(args_list)));
 	return make_function(car(args_list), cdr(args_list), env);
 }
 
 static object *prim_set(object *env, object *args_list)
 {
-	debug_print();
 	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
 	return Ok;
 }
@@ -394,11 +372,8 @@ static bool is_true(object *obj)
 static object *prim_if(object *env, object *args_list)
 {
 	object *predicate = eval(env, car(args_list));
-	if (is_true(predicate)) {
-		debug_print();
+	if (is_true(predicate))
 		return eval(env, cadr(args_list));
-	}
-	debug_print();
 	return eval(env, caddr(args_list));
 }
 
