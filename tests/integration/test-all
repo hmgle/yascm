@@ -1,0 +1,43 @@
+BIN="../../yascm"
+
+clear; clear;
+
+echo "Test start"
+
+list=`find . -regex ".*in"`
+
+tmp=`mktemp -t yascm`
+# echo -e "create tempfile ${tmp}\n"
+
+errorCount=0;
+successCount=0;
+
+while read input; do
+    # echo "comparing" "${input}" "${input%.in}.out"
+    "${BIN}" < "${input}" >"${tmp}" 2>/dev/null
+    result=`diff -b -B -y "${tmp}" "${input%.in}.out"`
+    if [ ${?} != "0" ]; then
+        # rm "${tmp}"
+        # echo "Deleted tempfile ${tmp}"
+        echo -e "\nMismatch" "${input}" "${input%.in}.out"
+        echo -e "\nInput:\n"
+        cat "${input}"
+        echo -e "\nExpected | Actual"
+        echo -e "${result}\n"
+        # >&2 echo "An error is found."
+        errorCount=$((${errorCount} + 1));
+        # exit
+    else
+        echo "Passed" "${input}" "${input%.in}.out"
+        successCount=$((${successCount} + 1));
+    fi
+    
+done <<< "${list}"
+
+if [ ${errorCount} == 0 ]; then
+    echo "All ${successCount} test(s) passed!"
+else
+    echo "Found ${errorCount} mismatch(es)"
+fi
+rm "${tmp}"
+# echo "Deleted tempfile ${tmp}"

@@ -1,0 +1,12 @@
+(define x 10)
+x
+(define y x)
+y
+(define (y) x)
+(y) 
+(define (x) -9223372036854775808)
+(x)
+(define y (x))
+y
+(define y x)
+(y)
