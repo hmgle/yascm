@@ -25,6 +25,14 @@ cd yascm
 make
 ```
 
+If having trouble installing flex/bison, or you don't want to install flex/bison, you can clone the no-flex-bison branch:
+
+```
+git clone -b no-flex-bison https://github.com/hmgle/yascm.git
+cd yascm
+make
+```
+
 ## Example
 
 - Recursion
