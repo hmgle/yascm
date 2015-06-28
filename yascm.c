@@ -21,11 +21,6 @@ static object *create_object(int type)
 	return obj;
 }
 
-static void destroy_object(object *obj)
-{
-	/* TODO */
-}
-
 static object *car(object *pair)
 {
 	return pair->car;
@@ -285,19 +280,17 @@ static int list_length(object *list)
 
 static object *prim_quote(object *env, object *args_list)
 {
-	if (list_length(args_list) != 1) {
+	if (list_length(args_list) != 1)
 		DIE("quote");
-	}
 	return args_list->car;
 }
 
 static object *def_var(object *args)
 {
-	if (args->car->type == SYMBOL) {
+	if (args->car->type == SYMBOL)
 		return car(args);
-	} else { /* PAIR */
+	else /* PAIR */
 		return caar(args);
-	}
 }
 
 static object *def_val(object *args, object *env)
@@ -312,7 +305,6 @@ static void define_variable(object *var, object *val, object *env)
 {
 	object *oldvar = lookup_variable_val(var, env);
 	if (oldvar != NULL) {
-		destroy_object(oldvar->cdr);
 		oldvar->cdr = val;
 		return;
 	}
@@ -334,7 +326,6 @@ static void set_var_val(object *var, object *val, object *env)
 	object *oldvar = lookup_variable_val(var, env);
 	if (oldvar == NULL)
 		DIE("unbound variable");
-	destroy_object(oldvar->cdr);
 	oldvar->cdr = val;
 }
 
@@ -394,15 +385,13 @@ static object *prim_cond(object *env, object *args_list)
 	while (pairs != Nil) {
 		predicate = eval(env, caar(pairs));
 		if (!is_the_last_arg(pairs)) {
-			if (predicate->bool_val) {
+			if (predicate->bool_val)
 				return eval(env, car(cdar(pairs)));
-			}
 		} else {
-			if (is_else(predicate)) {
+			if (is_else(predicate))
 				return eval(env, car(cdar(pairs)));
-			} else if (predicate->bool_val) {
+			else if (predicate->bool_val)
 				return eval(env, car(cdar(pairs)));
-			}
 		}
 		pairs = pairs->cdr;
 	}
