@@ -1,0 +1,7 @@
+(define (fixed f) 
+    (define x (f x))
+    x
+)
+
+fixed
+
