@@ -190,6 +190,7 @@ object *eval(object *env, object *obj)
 	object *bind;
 	object *fn, *args;
 	object *newenv, *newobj;
+	object *eval_args;
 	if (obj == Nil) return Nil;
 	switch (obj->type) {
 	case FIXNUM:
@@ -212,7 +213,9 @@ object *eval(object *env, object *obj)
 			return apply(env, fn, args);
 		} else if (fn->type == COMPOUND_PROC) {
 			debug_print();
-			newenv = extend_env(fn->parameters, args, fn->env);
+			eval_args = list_of_val(args, env);
+			// newenv = extend_env(fn->parameters, args, fn->env);
+			newenv = extend_env(fn->parameters, eval_args, fn->env);
 			newobj = fn->body;
 			debug_print("newobj->type: %d", newobj->type);
 			while (!is_the_last_arg(newobj)) {
