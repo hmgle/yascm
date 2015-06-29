@@ -24,6 +24,7 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 "#f"	{return FALSE_T;}
 "#t"	{return TRUE_T;}
 {WS}*	/* do nothing with white space */
+;.*$	/* Scheme comment */
 
 [-]?{DIG} {
 	yylval.n = strtoll(yytext, NULL, 10);
