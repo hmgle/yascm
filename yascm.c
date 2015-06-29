@@ -9,6 +9,12 @@ object *Nil;
 object *Else;
 object *Ok;
 static object *Symbol_table;
+static bool NOT_END = true;
+
+void eof_handle(void)
+{
+	NOT_END = false;
+}
 
 static object *create_object(int type)
 {
@@ -73,10 +79,12 @@ object *make_char(char val)
 
 object *make_string(const char *val)
 {
+	size_t len = strlen(val) - 1; /* ignore the last DOUBLE_QUOTE */
 	object *obj = create_object(STRING);
-	obj->string_val = malloc(strlen(val) + 1);
+	obj->string_val = malloc(len + 1);
 	assert(obj->string_val != NULL);
-	strcpy(obj->string_val, val);
+	strncpy(obj->string_val, val, len);
+	obj->string_val[len] = '\0';
 	return obj;
 }
 
@@ -465,6 +473,28 @@ static object *prim_is_num_gt(object *env, object *args_list)
 	return make_bool(true);
 }
 
+static object *prim_load(object *env, object *args_list)
+{
+	object *obj;
+	const char *filename = car(args_list)->string_val;
+	fprintf(stderr, "; loading %s\n", filename);
+	FILE *f = fopen(filename, "r");
+	if (f == NULL) {
+		fprintf(stderr, "fopen() %s fail!", car(args_list)->string_val);
+		return Nil;
+	}
+	yyrestart(f);
+	while (NOT_END) {
+		yyparse(&obj);
+		eval(env, obj);
+	}
+	fclose(f);
+	fprintf(stderr, "; done loading %s\n", filename);
+	NOT_END = true;
+	yyrestart(stdin);
+	return Ok;
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "define", prim_define, KEYWORD);
@@ -478,6 +508,7 @@ static void define_prim(object *env)
 	add_primitive(env, "eq?", prim_is_eq, PRIM);
 	add_primitive(env, "=", prim_is_num_eq, PRIM);
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
+	add_primitive(env, "load", prim_load, PRIM);
 }
 
 object *make_env(object *var, object *up)
@@ -499,7 +530,7 @@ int main(int argc, char **argv)
 	define_prim(genv);
 	add_variable(genv, make_symbol("else"), Else);
 	fprintf(stderr, "welcome\n> ");
-	for (;;) {
+	while (NOT_END) {
 		yyparse(&obj);
 		object_print(eval(genv, obj));
 	}

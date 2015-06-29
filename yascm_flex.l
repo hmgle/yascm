@@ -25,6 +25,7 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 "#t"	{return TRUE_T;}
 {WS}*	/* do nothing with white space */
 ;.*$	/* Scheme comment */
+<<EOF>>	{return END_OF_FILE;}
 
 [-]?{DIG} {
 	yylval.n = strtoll(yytext, NULL, 10);

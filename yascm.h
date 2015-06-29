@@ -73,5 +73,6 @@ object *make_function(object *parameters, object *body, object *env);
 object *make_env(object *var, object *up);
 object *eval(object *env, object *obj);
 void object_print(const object *obj);
+void eof_handle(void);
 
 #endif

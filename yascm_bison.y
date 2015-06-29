@@ -28,6 +28,7 @@ void yyerror(struct object_s **obj, const char *s);
 %token <s> STRING_T
 %token DOUBLE_QUOTE
 %token <s> SYMBOL_T
+%token END_OF_FILE
 
 %type <s> string
 %type <var> object
@@ -44,6 +45,7 @@ void yyerror(struct object_s **obj, const char *s);
 
 /* exp: object {object_print(eval(GENV, $1));} exp */
 exp: object {*obj = $1; YYACCEPT;}
+   | END_OF_FILE {eof_handle(); YYACCEPT;}
 
 string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
 
@@ -76,5 +78,6 @@ object: TRUE_T		{$$ = make_bool(true);}
 void yyerror(struct object_s **obj, const char *s)
 {
 	(void)obj;
+	fprintf(stderr, "yyerror!\n");
 	exit(0);
 }
