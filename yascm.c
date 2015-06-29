@@ -471,6 +471,28 @@ static object *prim_is_num_gt(object *env, object *args_list)
 	return make_bool(true);
 }
 
+static object *prim_load(object *env, object *args_list)
+{
+	object *obj;
+	const char *filename = car(args_list)->string_val;
+	fprintf(stderr, "; loading %s\n", filename);
+	FILE *f = fopen(filename, "r");
+	if (f == NULL) {
+		fprintf(stderr, "fopen() %s fail!", car(args_list)->string_val);
+		return Nil;
+	}
+	yyrestart(f);
+	while (NOT_END) {
+		yyparse(&obj);
+		eval(env, obj);
+	}
+	fclose(f);
+	fprintf(stderr, "; done loading %s\n", filename);
+	NOT_END = true;
+	yyrestart(stdin);
+	return Ok;
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "define", prim_define, KEYWORD);
@@ -484,6 +506,7 @@ static void define_prim(object *env)
 	add_primitive(env, "eq?", prim_is_eq, PRIM);
 	add_primitive(env, "=", prim_is_num_eq, PRIM);
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
+	add_primitive(env, "load", prim_load, PRIM);
 }
 
 object *make_env(object *var, object *up)
