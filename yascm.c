@@ -247,12 +247,12 @@ void object_print(const object *obj)
 		if (obj == Nil)
 			printf("()\n");
 		else if (obj == Ok)
-			printf("; ok\n");
+			fprintf(stderr, "; ok\n");
 		else
 			printf("type: %d\n", obj->type);
 	}
 end:
-	printf("> ");
+	fprintf(stderr, "> ");
 }
 
 static void add_primitive(object *env, char *name, Primitive *func,
@@ -498,7 +498,7 @@ int main(int argc, char **argv)
 	Symbol_table = Nil;
 	define_prim(genv);
 	add_variable(genv, make_symbol("else"), Else);
-	printf("welcome\n> ");
+	fprintf(stderr, "welcome\n> ");
 	for (;;) {
 		yyparse(&obj);
 		object_print(eval(genv, obj));
