@@ -9,6 +9,12 @@ object *Nil;
 object *Else;
 object *Ok;
 static object *Symbol_table;
+static bool NOT_END = true;
+
+void eof_handle(void)
+{
+	NOT_END = false;
+}
 
 static object *create_object(int type)
 {
@@ -499,7 +505,7 @@ int main(int argc, char **argv)
 	define_prim(genv);
 	add_variable(genv, make_symbol("else"), Else);
 	fprintf(stderr, "welcome\n> ");
-	for (;;) {
+	while (NOT_END) {
 		yyparse(&obj);
 		object_print(eval(genv, obj));
 	}
