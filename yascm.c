@@ -416,9 +416,9 @@ static object *prim_cond(object *env, object *args_list)
 static object *prim_is_eq(object *env, object *args_list)
 {
 	object *obj;
-	object *first = eval(env, args_list->car);
+	object *first = args_list->car;
 	while (args_list != Nil) {
-		obj = eval(env, args_list->car);
+		obj = args_list->car;
 		if (obj->type != first->type)
 			return make_bool(false);
 		switch (first->type) {
@@ -449,9 +449,9 @@ static object *prim_is_eq(object *env, object *args_list)
 
 static object *prim_is_num_eq(object *env, object *args_list)
 {
-	int64_t first = eval(env, args_list->car)->int_val;
+	int64_t first = args_list->car->int_val;
 	while (args_list != Nil) {
-		if (eval(env, args_list->car)->int_val != first)
+		if (args_list->car->int_val != first)
 			return make_bool(false);
 		args_list = args_list->cdr;
 	}
@@ -461,10 +461,10 @@ static object *prim_is_num_eq(object *env, object *args_list)
 static object *prim_is_num_gt(object *env, object *args_list)
 {
 	int64_t next;
-	int64_t first = eval(env, args_list->car)->int_val;
+	int64_t first = args_list->car->int_val;
 	args_list = args_list->cdr;
 	while (args_list != Nil) {
-		next = eval(env, args_list->car)->int_val;
+		next = args_list->car->int_val;
 		if (next >= first)
 			return make_bool(false);
 		first = next;
