@@ -40,8 +40,6 @@ static object *cdr(object *pair)
 #define cadr(obj)	car(cdr(obj))
 #define cdar(obj)	cdr(car(obj))
 #define caar(obj)	car(car(obj))
-#define cddr(obj)	cdr(cdr(obj))
-#define caadr(obj)	car(car(cdr(obj)))
 #define caddr(obj)	car(cdr(cdr(obj)))
 
 object *cons(object *car, object *cdr)
@@ -415,9 +413,44 @@ static object *prim_cond(object *env, object *args_list)
 
 static object *prim_is_null(object *env, object *args_list)
 {
-	if (args_list->car == Nil)
-		return make_bool(true);
-	return make_bool(false);
+	return make_bool((args_list->car == Nil) ? true : false);
+}
+
+static object *prim_is_boolean(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == BOOL) ? true : false);
+}
+
+static object *prim_is_pair(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == PAIR) ? true : false);
+}
+
+static object *prim_is_symbol(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == SYMBOL) ? true : false);
+}
+
+static object *prim_is_number(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == FIXNUM ||
+			args_list->car->type == FLOATNUM) ? true : false);
+}
+
+static object *prim_is_char(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == CHAR) ? true : false);
+}
+
+static object *prim_is_string(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == STRING) ? true : false);
+}
+
+static object *prim_is_procedure(object *env, object *args_list)
+{
+	return make_bool((args_list->car->type == COMPOUND_PROC ||
+			args_list->car->type == PRIM) ? true : false);
 }
 
 static object *prim_is_eq(object *env, object *args_list)
@@ -517,6 +550,13 @@ static void define_prim(object *env)
 	add_primitive(env, "+", prim_plus, PRIM);
 	add_primitive(env, "quote", prim_quote, PRIM);
 	add_primitive(env, "null?", prim_is_null, PRIM);
+	add_primitive(env, "boolean?", prim_is_boolean, PRIM);
+	add_primitive(env, "pair?", prim_is_pair, PRIM);
+	add_primitive(env, "symbol?", prim_is_symbol, PRIM);
+	add_primitive(env, "number?", prim_is_number, PRIM);
+	add_primitive(env, "char?", prim_is_char, PRIM);
+	add_primitive(env, "string?", prim_is_string, PRIM);
+	add_primitive(env, "procedure?", prim_is_procedure, PRIM);
 	add_primitive(env, "eq?", prim_is_eq, PRIM);
 	add_primitive(env, "=", prim_is_num_eq, PRIM);
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
