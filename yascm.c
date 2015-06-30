@@ -473,14 +473,13 @@ static object *prim_is_num_gt(object *env, object *args_list)
 	return make_bool(true);
 }
 
-static object *prim_load(object *env, object *args_list)
+static object *load_file(const char *filename, object *env)
 {
 	object *obj;
-	const char *filename = car(args_list)->string_val;
 	fprintf(stderr, "; loading %s\n", filename);
 	FILE *f = fopen(filename, "r");
 	if (f == NULL) {
-		fprintf(stderr, "fopen() %s fail!", car(args_list)->string_val);
+		fprintf(stderr, "fopen() %s fail!\n", filename);
 		return Nil;
 	}
 	yyrestart(f);
@@ -493,6 +492,11 @@ static object *prim_load(object *env, object *args_list)
 	NOT_END = true;
 	yyrestart(stdin);
 	return Ok;
+}
+
+static object *prim_load(object *env, object *args_list)
+{
+	return load_file(car(args_list)->string_val, env);
 }
 
 static void define_prim(object *env)
@@ -529,6 +533,7 @@ int main(int argc, char **argv)
 	Symbol_table = Nil;
 	define_prim(genv);
 	add_variable(genv, make_symbol("else"), Else);
+	(void)load_file("stdlib.scm", genv);
 	fprintf(stderr, "welcome\n> ");
 	while (NOT_END) {
 		yyparse(&obj);
