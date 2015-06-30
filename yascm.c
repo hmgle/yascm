@@ -413,6 +413,13 @@ static object *prim_cond(object *env, object *args_list)
 	DIE("cond error exp!");
 }
 
+static object *prim_is_null(object *env, object *args_list)
+{
+	if (args_list->car == Nil)
+		return make_bool(true);
+	return make_bool(false);
+}
+
 static object *prim_is_eq(object *env, object *args_list)
 {
 	object *obj;
@@ -509,6 +516,7 @@ static void define_prim(object *env)
 
 	add_primitive(env, "+", prim_plus, PRIM);
 	add_primitive(env, "quote", prim_quote, PRIM);
+	add_primitive(env, "null?", prim_is_null, PRIM);
 	add_primitive(env, "eq?", prim_is_eq, PRIM);
 	add_primitive(env, "=", prim_is_num_eq, PRIM);
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
