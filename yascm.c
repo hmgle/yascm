@@ -3,6 +3,7 @@
 #include <string.h>
 #include "yascm.h"
 
+extern FILE *yyin;
 int yyparse(struct object_s **env);
 
 object *Nil;
@@ -516,6 +517,7 @@ static object *prim_is_num_gt(object *env, object *args_list)
 static object *load_file(const char *filename, object *env)
 {
 	object *obj;
+	FILE *oldin = (yyin == NULL) ? stdin : yyin;
 	fprintf(stderr, "; loading %s\n", filename);
 	FILE *f = fopen(filename, "r");
 	if (f == NULL) {
@@ -530,7 +532,7 @@ static object *load_file(const char *filename, object *env)
 	fclose(f);
 	fprintf(stderr, "; done loading %s\n", filename);
 	NOT_END = true;
-	yyrestart(stdin);
+	yyrestart(oldin);
 	return Ok;
 }
 
