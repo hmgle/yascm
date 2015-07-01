@@ -33,7 +33,7 @@ cd yascm
 make
 ```
 
-## Example
+## Examples
 
 - Recursion
 
@@ -95,10 +95,11 @@ welcome
 > 
 ```
 
-## Author
+## Authors
 
-hmgle <dustgle@gmail.com>
+- Created by hmgle <dustgle@gmail.com>
+- [Contributors](https://github.com/hmgle/yascm/graphs/contributors)
 
 ## LICENSE
 
-GPL Version 3, see the COPYING file included in the source distribution.
+GPL Version 3, see the [COPYING](COPYING) file included in the source distribution.
