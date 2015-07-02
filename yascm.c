@@ -536,6 +536,11 @@ static object *load_file(const char *filename, object *env)
 	return Ok;
 }
 
+static object *prim_eval(object *env, object *args_list)
+{
+	return eval(env, car(args_list));
+}
+
 static object *prim_load(object *env, object *args_list)
 {
 	return load_file(car(args_list)->string_val, env);
@@ -562,6 +567,7 @@ static void define_prim(object *env)
 	add_primitive(env, "eq?", prim_is_eq, PRIM);
 	add_primitive(env, "=", prim_is_num_eq, PRIM);
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
+	add_primitive(env, "eval", prim_eval, PRIM);
 	add_primitive(env, "load", prim_load, PRIM);
 }
 
