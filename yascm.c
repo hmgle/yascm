@@ -187,14 +187,6 @@ object *eval(object *env, object *obj)
 	object *eval_args;
 	if (obj == Nil) return Nil;
 	switch (obj->type) {
-	case FIXNUM:
-	case FLOATNUM:
-	case BOOL:
-	case CHAR:
-	case STRING:
-	case OTHER:
-	case COMPOUND_PROC:
-		return obj;
 	case SYMBOL:
 		bind = lookup_variable_val(obj, env);
 		if (!bind)
@@ -215,51 +207,68 @@ object *eval(object *env, object *obj)
 			}
 			return eval(newenv, newobj->car);
 		} else {
-			DIE("not COMPOUND_PROC or PRIM: %d", fn->type);
+			return obj; /* list */
 		}
 	default:
-		debug_print("Unknow type: %d", obj->type);
+		return obj;
 	}
-	return Nil;
+}
+
+static void pair_print(const object *pair)
+{
+	const object *car_pair = pair->car;
+	const object *cdr_pair = pair->cdr;
+	object_print(car_pair);
+	if (cdr_pair == Nil) {
+		return;
+	} else if (cdr_pair->type == PAIR) {
+		printf(" ");
+		pair_print(cdr_pair);
+	} else {
+		printf(" . ");
+		object_print(cdr_pair);
+	}
 }
 
 void object_print(const object *obj)
 {
-	if (!obj)
-		goto end;
+	if (!obj) return;
 	switch (obj->type) {
 	case FIXNUM:
-		printf("%ld\n", obj->int_val);
+		printf("%ld", obj->int_val);
 		break;
 	case KEYWORD:
-		printf("<keywork>\n");
+		printf("<keywork>");
 		break;
 	case PRIM:
-		printf("<primitive>\n");
+		printf("<primitive>");
 		break;
 	case BOOL:
-		printf("#%c\n", obj->bool_val ? 't' : 'f');
+		printf("#%c", obj->bool_val ? 't' : 'f');
 		break;
 	case CHAR:
-		printf("#\\%c\n", obj->char_val);
+		printf("#\\%c", obj->char_val);
 		break;
 	case STRING:
 	case SYMBOL:
-		printf("%s\n", obj->string_val);
+		printf("%s", obj->string_val);
+		break;
+	case PAIR:
+		printf("(");
+		pair_print(obj);
+		printf(")");
 		break;
 	case COMPOUND_PROC:
-		printf("<proc>\n");
+		printf("<proc>");
 		break;
 	default:
 		if (obj == Nil)
-			printf("()\n");
+			printf("()");
 		else if (obj == Ok)
-			fprintf(stderr, "; ok\n");
+			fprintf(stderr, "; ok");
 		else
-			printf("type: %d\n", obj->type);
+			printf("type: %d", obj->type);
 	}
-end:
-	fprintf(stderr, "> ");
 }
 
 static void add_primitive(object *env, char *name, Primitive *func,
@@ -279,6 +288,26 @@ static object *prim_plus(object *env, object *args_list)
 		args_list = args_list->cdr;
 	}
 	return make_fixnum(ret);
+}
+
+static object *prim_cons(object *env, object *args_list)
+{
+	return cons(car(args_list), cadr(args_list));
+}
+
+static object *prim_car(object *env, object *args_list)
+{
+	return caar(args_list);
+}
+
+static object *prim_cdr(object *env, object *args_list)
+{
+	return cdar(args_list);
+}
+
+static object *prim_list(object *env, object *args_list)
+{
+	return args_list;
 }
 
 static int list_length(object *list)
@@ -555,6 +584,10 @@ static void define_prim(object *env)
 	add_primitive(env, "cond", prim_cond, KEYWORD);
 
 	add_primitive(env, "+", prim_plus, PRIM);
+	add_primitive(env, "cons", prim_cons, PRIM);
+	add_primitive(env, "car", prim_car, PRIM);
+	add_primitive(env, "cdr", prim_cdr, PRIM);
+	add_primitive(env, "list", prim_list, PRIM);
 	add_primitive(env, "quote", prim_quote, PRIM);
 	add_primitive(env, "null?", prim_is_null, PRIM);
 	add_primitive(env, "boolean?", prim_is_boolean, PRIM);
@@ -594,6 +627,7 @@ int main(int argc, char **argv)
 	while (NOT_END) {
 		yyparse(&obj);
 		object_print(eval(genv, obj));
+		printf("\n> ");
 	}
 	return 0;
 }
