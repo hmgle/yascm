@@ -586,13 +586,13 @@ static void define_prim(object *env)
 	add_primitive(env, "set!", prim_set, KEYWORD);
 	add_primitive(env, "if", prim_if, KEYWORD);
 	add_primitive(env, "cond", prim_cond, KEYWORD);
+	add_primitive(env, "quote", prim_quote, KEYWORD);
 
 	add_primitive(env, "+", prim_plus, PRIM);
 	add_primitive(env, "cons", prim_cons, PRIM);
 	add_primitive(env, "car", prim_car, PRIM);
 	add_primitive(env, "cdr", prim_cdr, PRIM);
 	add_primitive(env, "list", prim_list, PRIM);
-	add_primitive(env, "quote", prim_quote, PRIM);
 	add_primitive(env, "null?", prim_is_null, PRIM);
 	add_primitive(env, "boolean?", prim_is_boolean, PRIM);
 	add_primitive(env, "pair?", prim_is_pair, PRIM);
