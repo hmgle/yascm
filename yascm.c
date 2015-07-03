@@ -170,11 +170,11 @@ static object *apply(object *env, object *fn, object *args)
 object *extend_env(object *vars, object *vals, object *base_env)
 {
 	object *newenv = make_env(Nil, base_env);
-	if (vars->type == SYMBOL) { /* e.g. (lambda x x) */
-		add_variable(newenv, vars, vals);
-		return newenv;
-	}
 	while (vars != Nil && vals != Nil) {
+		if (vars->type == SYMBOL) {
+			add_variable(newenv, vars, vals);
+			return newenv;
+		}
 		add_variable(newenv, vars->car, eval(base_env, vals->car));
 		vars = vars->cdr;
 		vals = vals->cdr;
