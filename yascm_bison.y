@@ -35,9 +35,10 @@ void yyerror(struct object_s **obj, const char *s);
 %type <n> number
 %type <var> emptylist
 %type <var> quote_list
-%type <var> pairs_list 
-%type <var> pairs_end
-%type <var> pairs
+%type <var> pair
+%type <var> list_item
+%type <var> list_end
+%type <var> list
 
 %start exp
 
@@ -56,22 +57,25 @@ emptylist: LP RP
 
 quote_list: QUOTE object {$$ = make_quote($2);}
 
-pairs_list: object {$$ = cons($1, make_emptylist());}
-	  | object pairs_list {$$ = cons($1, $2);}
+pair: object DOT object {$$ = cons($1, $3);}
 
-pairs_end: pairs_list RP {$$ = $1;}
+list_item: object {$$ = cons($1, make_emptylist());}
+	  | object list_item {$$ = cons($1, $2);}
+	  | pair {$$ = $1;}
 
-pairs: LP pairs_end {$$ = $2;}
+list_end: list_item RP {$$ = $1;}
+
+list: LP list_end {$$ = $2;}
 
 object: TRUE_T		{$$ = make_bool(true);}
       | FALSE_T		{$$ = make_bool(false);}
+      | number		{$$ = make_fixnum($1);}
       | CHAR_T		{$$ = make_char($1);}
       | string		{$$ = make_string($1);}
-      | number		{$$ = make_fixnum($1);}
+      | SYMBOL_T	{$$ = make_symbol($1);}
       | emptylist	{$$ = make_emptylist();}
       | quote_list	{$$ = $1;}
-      | SYMBOL_T	{$$ = make_symbol($1);}
-      | pairs		{$$ = $1;}
+      | list		{$$ = $1;}
 
 %%
 
