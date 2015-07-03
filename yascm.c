@@ -254,6 +254,8 @@ void object_print(const object *obj)
 		printf("#\\%c", obj->char_val);
 		break;
 	case STRING:
+		printf("\"%s\"", obj->string_val);
+		break;
 	case SYMBOL:
 		printf("%s", obj->string_val);
 		break;
