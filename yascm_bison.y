@@ -35,6 +35,7 @@ void yyerror(struct object_s **obj, const char *s);
 %type <n> number
 %type <var> emptylist
 %type <var> quote_list
+%type <var> pair
 %type <var> pairs_list 
 %type <var> pairs_end
 %type <var> pairs
@@ -56,8 +57,11 @@ emptylist: LP RP
 
 quote_list: QUOTE object {$$ = make_quote($2);}
 
+pair: object DOT object {$$ = cons($1, $3);}
+
 pairs_list: object {$$ = cons($1, make_emptylist());}
 	  | object pairs_list {$$ = cons($1, $2);}
+	  | pair {$$ = $1;}
 
 pairs_end: pairs_list RP {$$ = $1;}
 
