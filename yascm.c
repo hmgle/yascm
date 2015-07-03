@@ -296,6 +296,16 @@ static object *prim_plus(object *env, object *args_list)
 	return make_fixnum(ret);
 }
 
+static object *prim_mul(object *env, object *args_list)
+{
+	int64_t ret = 1;
+	while (args_list != Nil) {
+		ret *= (car(args_list)->int_val);
+		args_list = args_list->cdr;
+	}
+	return make_fixnum(ret);
+}
+
 static object *prim_cons(object *env, object *args_list)
 {
 	return cons(car(args_list), cadr(args_list));
@@ -591,6 +601,7 @@ static void define_prim(object *env)
 	add_primitive(env, "quote", prim_quote, KEYWORD);
 
 	add_primitive(env, "+", prim_plus, PRIM);
+	add_primitive(env, "*", prim_mul, PRIM);
 	add_primitive(env, "cons", prim_cons, PRIM);
 	add_primitive(env, "car", prim_car, PRIM);
 	add_primitive(env, "cdr", prim_cdr, PRIM);
