@@ -175,7 +175,7 @@ object *extend_env(object *vars, object *vals, object *base_env)
 			add_variable(newenv, vars, vals);
 			return newenv;
 		}
-		add_variable(newenv, vars->car, eval(base_env, vals->car));
+		add_variable(newenv, vars->car, vals->car);
 		vars = vars->cdr;
 		vals = vals->cdr;
 	}
