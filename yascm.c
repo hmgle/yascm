@@ -296,6 +296,31 @@ static object *prim_plus(object *env, object *args_list)
 	return make_fixnum(ret);
 }
 
+static int list_length(object *list)
+{
+	int len = 0;
+	for (;;) {
+		if (list == Nil)
+			return len;
+		list = list->cdr;
+		len++;
+	}
+}
+
+static object *prim_sub(object *env, object *args_list)
+{
+	int64_t ret;
+	if (list_length(args_list) == 1)
+		return make_fixnum(-car(args_list)->int_val);
+	ret = car(args_list)->int_val;
+	args_list = args_list->cdr;
+	while (args_list != Nil) {
+		ret -= (car(args_list)->int_val);
+		args_list = args_list->cdr;
+	}
+	return make_fixnum(ret);
+}
+
 static object *prim_mul(object *env, object *args_list)
 {
 	int64_t ret = 1;
@@ -324,17 +349,6 @@ static object *prim_cdr(object *env, object *args_list)
 static object *prim_list(object *env, object *args_list)
 {
 	return args_list;
-}
-
-static int list_length(object *list)
-{
-	int len = 0;
-	for (;;) {
-		if (list == Nil)
-			return len;
-		list = list->cdr;
-		len++;
-	}
 }
 
 static object *prim_quote(object *env, object *args_list)
@@ -601,6 +615,7 @@ static void define_prim(object *env)
 	add_primitive(env, "quote", prim_quote, KEYWORD);
 
 	add_primitive(env, "+", prim_plus, PRIM);
+	add_primitive(env, "-", prim_sub, PRIM);
 	add_primitive(env, "*", prim_mul, PRIM);
 	add_primitive(env, "cons", prim_cons, PRIM);
 	add_primitive(env, "car", prim_car, PRIM);
