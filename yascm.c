@@ -413,6 +413,25 @@ static object *prim_lambda(object *env, object *args_list)
 	return make_function(car(args_list), cdr(args_list), env);
 }
 
+static object *prim_let(object *env, object *args_list)
+{
+	object *parameters;
+	object *exps;
+	object **para_end = &parameters;
+	object **exps_end = &exps;
+	object *let_var_exp = car(args_list);
+	object *let_body = cdr(args_list);
+	while (let_var_exp != Nil) {
+		*para_end = cons(caar(let_var_exp), Nil);
+		para_end = &((*para_end)->cdr);
+		*exps_end = cons(car(cdar(let_var_exp)), Nil);
+		exps_end = &((*exps_end)->cdr);
+		let_var_exp = cdr(let_var_exp);
+	}
+	object *lambda = make_function(parameters, let_body, env);
+	return eval(env, cons(lambda, exps));
+}
+
 static object *prim_set(object *env, object *args_list)
 {
 	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
@@ -609,6 +628,7 @@ static void define_prim(object *env)
 {
 	add_primitive(env, "define", prim_define, KEYWORD);
 	add_primitive(env, "lambda", prim_lambda, KEYWORD);
+	add_primitive(env, "let", prim_let, KEYWORD);
 	add_primitive(env, "set!", prim_set, KEYWORD);
 	add_primitive(env, "if", prim_if, KEYWORD);
 	add_primitive(env, "cond", prim_cond, KEYWORD);
