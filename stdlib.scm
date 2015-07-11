@@ -23,3 +23,8 @@
         count
         (length-iter (cdr a) (+ 1 count))))
   (length-iter items 0))
+
+(define (for-each f l)
+  (cond ((not (null? l))
+         (let ((unused (f (car l))))
+           (for-each f (cdr l))))))
