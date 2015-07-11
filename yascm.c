@@ -9,6 +9,7 @@ int yyparse(struct object_s **env);
 object *Nil;
 object *Else;
 object *Ok;
+object *Unspecified;
 static object FALSE = {
 	.type = BOOL,
 	.bool_val = false,
@@ -279,6 +280,8 @@ void object_print(const object *obj)
 			printf("()");
 		else if (obj == Ok)
 			fprintf(stderr, "; ok");
+		else if (obj == Unspecified)
+			fprintf(stderr, "; <unspecified>");
 		else
 			printf("type: %d", obj->type);
 	}
@@ -534,7 +537,7 @@ static object *prim_cond(object *env, object *args_list)
 		}
 		pairs = pairs->cdr;
 	}
-	DIE("cond error exp!");
+	return Unspecified;
 }
 
 static object *prim_is_null(object *env, object *args_list)
@@ -733,6 +736,7 @@ int main(int argc, char **argv)
 	Nil = create_object(OTHER);
 	Else = create_object(OTHER);
 	Ok = create_object(OTHER);
+	Unspecified = create_object(OTHER);
 	object *genv = make_env(Nil, NULL);
 	object *obj;
 	Symbol_table = Nil;
