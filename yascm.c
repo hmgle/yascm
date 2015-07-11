@@ -281,7 +281,7 @@ void object_print(const object *obj)
 		else if (obj == Ok)
 			fprintf(stderr, "; ok");
 		else if (obj == Unspecified)
-			fprintf(stderr, "; <unspecified>");
+			(void)0;
 		else
 			printf("type: %d", obj->type);
 	}
