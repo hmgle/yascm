@@ -671,6 +671,18 @@ static object *prim_load(object *env, object *args_list)
 	return load_file(car(args_list)->string_val, env);
 }
 
+static object *prim_display(object *env, object *args_list)
+{
+	object_print(car(args_list));
+	return Ok;
+}
+
+static object *prim_newline(object *env, object *args_list)
+{
+	printf("\n");
+	return Ok;
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "define", prim_define, KEYWORD);
@@ -704,6 +716,8 @@ static void define_prim(object *env)
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
 	add_primitive(env, "eval", prim_eval, PRIM);
 	add_primitive(env, "load", prim_load, PRIM);
+	add_primitive(env, "display", prim_display, PRIM);
+	add_primitive(env, "newline", prim_newline, PRIM);
 }
 
 object *make_env(object *var, object *up)
