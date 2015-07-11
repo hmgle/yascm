@@ -12,3 +12,5 @@
 
 (define (not x)
   (if x #f #t))
+
+(define (zero? x) (= 0 x))

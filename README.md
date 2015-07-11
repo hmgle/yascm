@@ -41,7 +41,7 @@ make
 $ ./yascm
 welcome
 > (define (sum x)
-  (if (= 0 x) 0 (+ x (sum (+ x -1)))))
+    (if (= 0 x) 0 (+ x (sum (- x 1)))))
 ; ok
 > (sum 10000)
 50005000
@@ -54,7 +54,7 @@ welcome
 $ ./yascm
 welcome
 > (define (add a)
- (lambda (b) (+ a b)))
+    (lambda (b) (+ a b)))
 ; ok
 > (define add3 (add 3))
 ; ok
@@ -84,7 +84,7 @@ $ ./yascm
 welcome
 > (define (A k x1 x2 x3 x4 x5)
     (define (B)
-      (set! k (+ k -1))
+      (set! k (- k 1))
       (A k B x1 x2 x3 x4))
     (if (> 1 k)
         (+ (x4) (x5))
@@ -93,6 +93,31 @@ welcome
 > (A 10 (lambda () 1) (lambda () -1) (lambda () -1) (lambda () 1) (lambda () 0))
 -67
 > 
+```
+
+- [Y combinator](http://rosettacode.org/wiki/Y_combinator#Scheme)
+
+```
+$ ./yascm
+; loading stdlib.scm
+; done loading stdlib.scm
+welcome
+> (define Y
+    (lambda (h)
+      ((lambda (x) (x x))
+       (lambda (g)
+         (h (lambda args (apply (g g) args)))))))
+; ok
+> (define fib
+    (Y
+      (lambda (f)
+        (lambda (x)
+          (if (> 2 x)
+              x
+              (+ (f (- x 1)) (f (- x 2))))))))
+; ok
+> (fib 10)
+55
 ```
 
 ## Authors
