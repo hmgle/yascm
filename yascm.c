@@ -480,6 +480,18 @@ static object *prim_or(object *env, object *args_list)
 	return ret;
 }
 
+static object *prim_begin(object *env, object *args_list)
+{
+	object *obj;
+	object *ret;
+	while (args_list != Nil) {
+		obj = car(args_list);
+		ret = eval(env, obj);
+		args_list = args_list->cdr;
+	}
+	return ret;
+}
+
 static object *prim_if(object *env, object *args_list)
 {
 	object *predicate = eval(env, car(args_list));
@@ -660,6 +672,7 @@ static void define_prim(object *env)
 	add_primitive(env, "set!", prim_set, KEYWORD);
 	add_primitive(env, "and", prim_and, KEYWORD);
 	add_primitive(env, "or", prim_or, KEYWORD);
+	add_primitive(env, "begin", prim_begin, KEYWORD);
 	add_primitive(env, "if", prim_if, KEYWORD);
 	add_primitive(env, "cond", prim_cond, KEYWORD);
 	add_primitive(env, "quote", prim_quote, KEYWORD);
