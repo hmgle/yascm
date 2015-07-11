@@ -120,6 +120,20 @@ welcome
 55
 ```
 
+- [Quine](https://en.wikipedia.org/wiki/Quine_%28computing%29)
+
+```
+$ ./yascm 
+; loading stdlib.scm
+; done loading stdlib.scm
+welcome
+> ((lambda (x)
+      (list x (list (quote quote) x)))
+    (quote
+      (lambda (x)
+        (list x (list (quote quote) x)))))
+```
+
 ## Authors
 
 - Created by hmgle <dustgle@gmail.com>
