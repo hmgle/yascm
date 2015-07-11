@@ -9,6 +9,14 @@ int yyparse(struct object_s **env);
 object *Nil;
 object *Else;
 object *Ok;
+static object FALSE = {
+	.type = BOOL,
+	.bool_val = false,
+};
+static object TRUE = {
+	.type = BOOL,
+	.bool_val = true,
+};
 static object *Symbol_table;
 static bool NOT_END = true;
 
@@ -64,9 +72,8 @@ static void add_variable(object *env, object *sym, object *val)
 
 object *make_bool(bool val)
 {
-	object *obj = create_object(BOOL);
-	obj->bool_val = val;
-	return obj;
+	/* XXX: Efficient but no safe */
+	return val ? &TRUE : &FALSE;
 }
 
 object *make_char(char val)
