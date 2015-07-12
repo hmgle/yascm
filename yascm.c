@@ -684,7 +684,10 @@ static object *prim_load(object *env, object *args_list)
 
 static object *prim_display(object *env, object *args_list)
 {
-	printf("%s", args_list->car->string_val);
+	if (args_list->car->type == STRING)
+		printf("%s", args_list->car->string_val);
+	else
+		object_print(car(args_list));
 	return Unspecified;
 }
 
