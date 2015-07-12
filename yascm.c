@@ -521,22 +521,29 @@ static bool is_else(object *sym)
 	return (sym == Else) ? true : false;
 }
 
+static object *eval_args_list(object *env, object *args_list)
+{
+	object *arg;
+	for (arg = args_list; !is_the_last_arg(arg); arg = arg->cdr)
+		(void)eval(env, arg->car);
+	return eval(env, arg->car);
+}
+
 static object *prim_cond(object *env, object *args_list)
 {
 	object *pairs = args_list;
 	object *predicate;
-	while (pairs != Nil) {
+	for (pairs = args_list; pairs != Nil; pairs = pairs->cdr) {
 		predicate = eval(env, caar(pairs));
 		if (!is_the_last_arg(pairs)) {
 			if (predicate->bool_val)
-				return eval(env, car(cdar(pairs)));
+				return eval_args_list(env, cdar(pairs));
 		} else {
 			if (is_else(predicate))
-				return eval(env, car(cdar(pairs)));
+				return eval_args_list(env, cdar(pairs));
 			else if (predicate->bool_val)
-				return eval(env, car(cdar(pairs)));
+				return eval_args_list(env, cdar(pairs));
 		}
-		pairs = pairs->cdr;
 	}
 	return Unspecified;
 }
