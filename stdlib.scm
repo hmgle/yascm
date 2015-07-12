@@ -46,3 +46,8 @@
   (cond ((null? x) false)
         ((eq? item (car x)) x)
         (else (memq item (cdr x)))))
+
+(define (append list1 list2)
+   (if (null? list1)
+       list2
+       (cons (car list1) (append (cdr list1) list2))))
