@@ -677,8 +677,8 @@ static object *prim_load(object *env, object *args_list)
 
 static object *prim_display(object *env, object *args_list)
 {
-	object_print(car(args_list));
-	return Ok;
+	printf("%s", args_list->car->string_val);
+	return Unspecified;
 }
 
 static object *prim_newline(object *env, object *args_list)
