@@ -28,3 +28,16 @@
   (cond ((not (null? l))
          (let ((unused (f (car l))))
            (for-each f (cdr l))))))
+
+(define (write x) (display x))
+
+(define true #t)
+(define false #f)
+
+(define (equal? a b)
+  (cond ((and (pair? a) (pair? b))
+         (and (equal? (car a) (car b)) 
+             (equal? (cdr a) (cdr b))))
+        ((and (not (pair? a)) (not (pair? b)))
+         (eq? a b))
+        (else false)))

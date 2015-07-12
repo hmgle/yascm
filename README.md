@@ -77,7 +77,7 @@ welcome
 >
 ```
 
-- [man or boy test](https://en.wikipedia.org/?title=Man_or_boy_test):
+- [Man or boy test](https://en.wikipedia.org/?title=Man_or_boy_test)
 
 ```
 $ ./yascm
