@@ -41,3 +41,8 @@
         ((and (not (pair? a)) (not (pair? b)))
          (eq? a b))
         (else false)))
+
+(define (memq item x)
+  (cond ((null? x) false)
+        ((eq? item (car x)) x)
+        (else (memq item (cdr x)))))
