@@ -202,7 +202,7 @@ object *eval(object *env, object *obj)
 	case SYMBOL:
 		bind = lookup_variable_val(obj, env);
 		if (!bind)
-			DIE("not define: %s", obj->string_val);
+			return Nil;
 		return bind->cdr;
 	case PAIR:
 		fn = eval(env, obj->car);
