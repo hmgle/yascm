@@ -190,7 +190,11 @@ object *extend_env(object *vars, object *vals, object *base_env)
 	return newenv;
 }
 
-static bool is_the_last_arg(object *args);
+static bool is_the_last_arg(object *args)
+{
+	return (args->cdr == Nil) ? true : false;
+}
+
 object *eval(object *env, object *obj)
 {
 	object *bind;
@@ -507,12 +511,9 @@ static object *prim_if(object *env, object *args_list)
 	object *predicate = eval(env, car(args_list));
 	if (is_true(predicate))
 		return eval(env, cadr(args_list));
+	if (is_the_last_arg(args_list->cdr))
+		return Unspecified;
 	return eval(env, caddr(args_list));
-}
-
-static bool is_the_last_arg(object *args)
-{
-	return (args->cdr == Nil) ? true : false;
 }
 
 static bool is_else(object *sym)
