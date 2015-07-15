@@ -41,7 +41,7 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 }
 
 \"	{BEGIN(EXPECT_STRING); return DOUBLE_QUOTE;}
-<EXPECT_STRING>(\\n|\\["]|\\\\|[^\\"])* {
+<EXPECT_STRING>([^\\\"]|\\.)* {
 	yylval.s = yytext;
 	return STRING_T;
 }
