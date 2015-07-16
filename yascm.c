@@ -86,11 +86,12 @@ object *make_char(char val)
 
 object *make_string(const char *val)
 {
-	size_t len = strlen(val) - 1; /* ignore the last DOUBLE_QUOTE */
+	ssize_t len = strlen(val) - 1; /* ignore the last DOUBLE_QUOTE */
 	object *obj = create_object(STRING);
 	obj->string_val = malloc(len + 1);
 	assert(obj->string_val != NULL);
-	strncpy(obj->string_val, val, len);
+	if (len > 0)
+		strncpy(obj->string_val, val, len);
 	obj->string_val[len] = '\0';
 	return obj;
 }

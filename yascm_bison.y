@@ -49,6 +49,7 @@ exp: object {*obj = $1; YYACCEPT;}
    | END_OF_FILE {eof_handle(); YYACCEPT;}
 
 string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
+      | DOUBLE_QUOTE DOUBLE_QUOTE {$$ = "\"";}
 
 number: FIXNUM_T {$$ = $1;}
       | FLOATNUM_T {printf("float: not support now\n");}
@@ -82,6 +83,6 @@ object: TRUE_T		{$$ = make_bool(true);}
 void yyerror(struct object_s **obj, const char *s)
 {
 	(void)obj;
-	fprintf(stderr, "yyerror!\n");
+	fprintf(stderr, "yyerror: %s!\n", s);
 	exit(0);
 }

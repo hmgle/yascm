@@ -524,7 +524,7 @@
 (test #\a char-downcase #\a)
 (SECTION 6 7)
 (test #t string? "The word \"recursion\\\" has many meanings.")
-; (test #t string? "")
+(test #t string? "")
 (define f (make-string 3 #\*))
 (test "?**" 'string-set! (begin (string-set! f 0 #\?) f))
 (test "abc" string #\a #\b #\c)
