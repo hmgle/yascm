@@ -470,7 +470,7 @@ static bool is_true(object *obj)
 static object *prim_and(object *env, object *args_list)
 {
 	object *obj;
-	object *ret;
+	object *ret = &TRUE;
 	while (args_list != Nil) {
 		obj = car(args_list);
 		ret = eval(env, obj);
@@ -484,7 +484,7 @@ static object *prim_and(object *env, object *args_list)
 static object *prim_or(object *env, object *args_list)
 {
 	object *obj;
-	object *ret;
+	object *ret = &FALSE;
 	while (args_list != Nil) {
 		obj = car(args_list);
 		ret = eval(env, obj);
