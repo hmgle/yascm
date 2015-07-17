@@ -391,10 +391,13 @@ static object *def_val(object *args, object *env)
 
 static void define_variable(object *var, object *val, object *env)
 {
-	object *oldvar = lookup_variable_val(var, env);
-	if (oldvar != NULL) {
-		oldvar->cdr = val;
-		return;
+	object *cell;
+	for (cell = env->vars; cell != Nil; cell = cell->cdr) {
+		object *oldvar = cell->car;
+		if (var == oldvar->car) {
+			oldvar->cdr = val;
+			return;
+		}
 	}
 	add_variable(env, var, val);
 }
