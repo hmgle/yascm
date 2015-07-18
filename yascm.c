@@ -643,10 +643,9 @@ static object *prim_is_num_gt(object *env, object *args)
 {
 	int64_t next;
 	int64_t first;
-	if (args != Nil)
-		first = args->car->int_val;
-	else
+	if (args == Nil)
 		return make_bool(true);
+	first = args->car->int_val;
 	for (args = args->cdr; args != Nil; first = next, args = args->cdr) {
 		next = args->car->int_val;
 		if (next >= first)
