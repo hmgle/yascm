@@ -42,7 +42,15 @@
 (define (not x)
   (if x #f #t))
 
-(define (< x y) (> y x))
+(define (less-list? elemlist)
+  (if (or (null? elemlist) (null? (cdr elemlist)))
+      #t
+      (if (or (> (car elemlist) (cadr elemlist))
+              (= (car elemlist) (cadr elemlist)))
+          #f
+          (less-list? (cdr elemlist)))))
+
+(define (< . args) (less-list? args))
 
 (define (less-or-eq-list? elemlist)
   (if (or (null? elemlist) (null? (cdr elemlist)))
