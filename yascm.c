@@ -639,17 +639,18 @@ static object *prim_is_num_eq(object *env, object *args_list)
 	return make_bool(true);
 }
 
-static object *prim_is_num_gt(object *env, object *args_list)
+static object *prim_is_num_gt(object *env, object *args)
 {
 	int64_t next;
-	int64_t first = args_list->car->int_val;
-	args_list = args_list->cdr;
-	while (args_list != Nil) {
-		next = args_list->car->int_val;
+	int64_t first;
+	if (args != Nil)
+		first = args->car->int_val;
+	else
+		return make_bool(true);
+	for (args = args->cdr; args != Nil; first = next, args = args->cdr) {
+		next = args->car->int_val;
 		if (next >= first)
 			return make_bool(false);
-		first = next;
-		args_list = args_list->cdr;
 	}
 	return make_bool(true);
 }
