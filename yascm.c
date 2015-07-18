@@ -615,11 +615,15 @@ static object *prim_is_eq(object *env, object *args)
 
 static object *prim_is_num_eq(object *env, object *args)
 {
-	int64_t first = args->car->int_val;
-	while (args != Nil) {
-		if (args->car->int_val != first)
+	int64_t next;
+	int64_t first;
+	if (args == Nil)
+		return make_bool(true);
+	first = args->car->int_val;
+	for (args = args->cdr; args != Nil; first = next, args = args->cdr) {
+		next = args->car->int_val;
+		if (next != first)
 			return make_bool(false);
-		args = args->cdr;
 	}
 	return make_bool(true);
 }
