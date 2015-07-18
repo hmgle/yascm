@@ -61,6 +61,15 @@
 
 (define (<= . args) (less-or-eq-list? args))
 
+(define (greater-or-eq-list? elemlist)
+  (if (or (null? elemlist) (null? (cdr elemlist)))
+      #t
+      (if (> (cadr elemlist) (car elemlist))
+          #f
+          (greater-or-eq-list? (cdr elemlist)))))
+
+(define (>= . args) (greater-or-eq-list? args))
+
 (define (zero? x) (= 0 x))
 
 (define (length items)
