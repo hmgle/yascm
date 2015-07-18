@@ -179,14 +179,12 @@ static object *apply(object *env, object *fn, object *args)
 object *extend_env(object *vars, object *vals, object *base_env)
 {
 	object *newenv = make_env(Nil, base_env);
-	while (vars != Nil && vals != Nil) {
+	for (; vars != Nil && vals != Nil; vars = vars->cdr, vals = vals->cdr) {
 		if (vars->type == SYMBOL) {
 			add_variable(newenv, vars, vals);
 			return newenv;
 		}
 		add_variable(newenv, vars->car, vals->car);
-		vars = vars->cdr;
-		vals = vals->cdr;
 	}
 	return newenv;
 }
@@ -217,11 +215,9 @@ object *eval(object *env, object *obj)
 		} else if (fn->type == COMPOUND_PROC) {
 			eval_args = list_of_val(args, env);
 			newenv = extend_env(fn->parameters, eval_args, fn->env);
-			newobj = fn->body;
-			while (!is_the_last_arg(newobj)) {
+			for (newobj = fn->body; !is_the_last_arg(newobj);
+			     newobj = newobj->cdr)
 				(void)eval(newenv, newobj->car);
-				newobj = newobj->cdr;
-			}
 			return eval(newenv, newobj->car);
 		} else {
 			return obj; /* list */
@@ -301,13 +297,11 @@ static void add_primitive(object *env, char *name, Primitive *func,
 	add_variable(env, sym, prim);
 }
 
-static object *prim_plus(object *env, object *args_list)
+static object *prim_plus(object *env, object *args)
 {
-	int64_t ret = 0;
-	while (args_list != Nil) {
-		ret += (car(args_list)->int_val);
-		args_list = args_list->cdr;
-	}
+	int64_t ret;
+	for (ret = 0; args != Nil; args = args->cdr)
+		ret += (car(args)->int_val);
 	return make_fixnum(ret);
 }
 
@@ -322,55 +316,50 @@ static int list_length(object *list)
 	}
 }
 
-static object *prim_sub(object *env, object *args_list)
+static object *prim_sub(object *env, object *args)
 {
 	int64_t ret;
-	if (list_length(args_list) == 1)
-		return make_fixnum(-car(args_list)->int_val);
-	ret = car(args_list)->int_val;
-	args_list = args_list->cdr;
-	while (args_list != Nil) {
-		ret -= (car(args_list)->int_val);
-		args_list = args_list->cdr;
-	}
+	if (list_length(args) == 1)
+		return make_fixnum(-car(args)->int_val);
+	ret = car(args)->int_val;
+	for (args = args->cdr; args != Nil; args = args->cdr)
+		ret -= (car(args)->int_val);
 	return make_fixnum(ret);
 }
 
-static object *prim_mul(object *env, object *args_list)
+static object *prim_mul(object *env, object *args)
 {
-	int64_t ret = 1;
-	while (args_list != Nil) {
-		ret *= (car(args_list)->int_val);
-		args_list = args_list->cdr;
-	}
+	int64_t ret;
+	for (ret = 1; args != Nil; args = args->cdr)
+		ret *= (car(args)->int_val);
 	return make_fixnum(ret);
 }
 
-static object *prim_cons(object *env, object *args_list)
+static object *prim_cons(object *env, object *args)
 {
-	return cons(car(args_list), cadr(args_list));
+	return cons(car(args), cadr(args));
 }
 
-static object *prim_car(object *env, object *args_list)
+static object *prim_car(object *env, object *args)
 {
-	return caar(args_list);
+	return caar(args);
 }
 
-static object *prim_cdr(object *env, object *args_list)
+static object *prim_cdr(object *env, object *args)
 {
-	return cdar(args_list);
+	return cdar(args);
 }
 
-static object *prim_list(object *env, object *args_list)
+static object *prim_list(object *env, object *args)
 {
-	return args_list;
+	return args;
 }
 
-static object *prim_quote(object *env, object *args_list)
+static object *prim_quote(object *env, object *args)
 {
-	if (list_length(args_list) != 1)
+	if (list_length(args) != 1)
 		DIE("quote");
-	return args_list->car;
+	return args->car;
 }
 
 static object *def_var(object *args)
@@ -420,25 +409,25 @@ static void set_var_val(object *var, object *val, object *env)
 	oldvar->cdr = val;
 }
 
-static object *prim_define(object *env, object *args_list)
+static object *prim_define(object *env, object *args)
 {
-	define_variable(def_var(args_list), def_val(args_list, env), env);
+	define_variable(def_var(args), def_val(args, env), env);
 	return Ok;
 }
 
-static object *prim_lambda(object *env, object *args_list)
+static object *prim_lambda(object *env, object *args)
 {
-	return make_function(car(args_list), cdr(args_list), env);
+	return make_function(car(args), cdr(args), env);
 }
 
-static object *prim_let(object *env, object *args_list)
+static object *prim_let(object *env, object *args)
 {
 	object *parameters;
 	object *exps;
 	object **para_end = &parameters;
 	object **exps_end = &exps;
-	object *let_var_exp = car(args_list);
-	object *let_body = cdr(args_list);
+	object *let_var_exp = car(args);
+	object *let_body = cdr(args);
 	while (let_var_exp != Nil) {
 		*para_end = cons(caar(let_var_exp), Nil);
 		para_end = &((*para_end)->cdr);
@@ -450,9 +439,9 @@ static object *prim_let(object *env, object *args_list)
 	return eval(env, cons(lambda, exps));
 }
 
-static object *prim_set(object *env, object *args_list)
+static object *prim_set(object *env, object *args)
 {
-	set_var_val(set_var(args_list), eval(env, set_val(args_list)), env);
+	set_var_val(set_var(args), eval(env, set_val(args)), env);
 	return Ok;
 }
 
@@ -470,54 +459,51 @@ static bool is_true(object *obj)
 	return !is_false(obj);
 }
 
-static object *prim_and(object *env, object *args_list)
+static object *prim_and(object *env, object *args)
 {
 	object *obj;
 	object *ret = &TRUE;
-	while (args_list != Nil) {
-		obj = car(args_list);
+	for (; args != Nil; args = args->cdr) {
+		obj = car(args);
 		ret = eval(env, obj);
 		if (is_false(ret))
 			return ret;
-		args_list = args_list->cdr;
 	}
 	return ret;
 }
 
-static object *prim_or(object *env, object *args_list)
+static object *prim_or(object *env, object *args)
 {
 	object *obj;
 	object *ret = &FALSE;
-	while (args_list != Nil) {
-		obj = car(args_list);
+	for (; args != Nil; args = args->cdr) {
+		obj = car(args);
 		ret = eval(env, obj);
 		if (is_true(ret))
 			return ret;
-		args_list = args_list->cdr;
 	}
 	return ret;
 }
 
-static object *prim_begin(object *env, object *args_list)
+static object *prim_begin(object *env, object *args)
 {
 	object *obj;
 	object *ret;
-	while (args_list != Nil) {
-		obj = car(args_list);
+	for (; args != Nil; args = args->cdr) {
+		obj = car(args);
 		ret = eval(env, obj);
-		args_list = args_list->cdr;
 	}
 	return ret;
 }
 
-static object *prim_if(object *env, object *args_list)
+static object *prim_if(object *env, object *args)
 {
-	object *predicate = eval(env, car(args_list));
+	object *predicate = eval(env, car(args));
 	if (is_true(predicate))
-		return eval(env, cadr(args_list));
-	if (is_the_last_arg(args_list->cdr))
+		return eval(env, cadr(args));
+	if (is_the_last_arg(args->cdr))
 		return Unspecified;
-	return eval(env, caddr(args_list));
+	return eval(env, caddr(args));
 }
 
 static bool is_else(object *sym)
@@ -533,11 +519,11 @@ static object *eval_args_list(object *env, object *args_list)
 	return eval(env, arg->car);
 }
 
-static object *prim_cond(object *env, object *args_list)
+static object *prim_cond(object *env, object *args)
 {
-	object *pairs = args_list;
+	object *pairs = args;
 	object *predicate;
-	for (pairs = args_list; pairs != Nil; pairs = pairs->cdr) {
+	for (pairs = args; pairs != Nil; pairs = pairs->cdr) {
 		predicate = eval(env, caar(pairs));
 		if (!is_the_last_arg(pairs)) {
 			if (predicate->bool_val)
@@ -552,54 +538,54 @@ static object *prim_cond(object *env, object *args_list)
 	return Unspecified;
 }
 
-static object *prim_is_null(object *env, object *args_list)
+static object *prim_is_null(object *env, object *args)
 {
-	return make_bool((args_list->car == Nil) ? true : false);
+	return make_bool((args->car == Nil) ? true : false);
 }
 
-static object *prim_is_boolean(object *env, object *args_list)
+static object *prim_is_boolean(object *env, object *args)
 {
-	return make_bool((args_list->car->type == BOOL) ? true : false);
+	return make_bool((args->car->type == BOOL) ? true : false);
 }
 
-static object *prim_is_pair(object *env, object *args_list)
+static object *prim_is_pair(object *env, object *args)
 {
-	return make_bool((args_list->car->type == PAIR) ? true : false);
+	return make_bool((args->car->type == PAIR) ? true : false);
 }
 
-static object *prim_is_symbol(object *env, object *args_list)
+static object *prim_is_symbol(object *env, object *args)
 {
-	return make_bool((args_list->car->type == SYMBOL) ? true : false);
+	return make_bool((args->car->type == SYMBOL) ? true : false);
 }
 
-static object *prim_is_number(object *env, object *args_list)
+static object *prim_is_number(object *env, object *args)
 {
-	return make_bool((args_list->car->type == FIXNUM ||
-			args_list->car->type == FLOATNUM) ? true : false);
+	return make_bool((args->car->type == FIXNUM ||
+			args->car->type == FLOATNUM) ? true : false);
 }
 
-static object *prim_is_char(object *env, object *args_list)
+static object *prim_is_char(object *env, object *args)
 {
-	return make_bool((args_list->car->type == CHAR) ? true : false);
+	return make_bool((args->car->type == CHAR) ? true : false);
 }
 
-static object *prim_is_string(object *env, object *args_list)
+static object *prim_is_string(object *env, object *args)
 {
-	return make_bool((args_list->car->type == STRING) ? true : false);
+	return make_bool((args->car->type == STRING) ? true : false);
 }
 
-static object *prim_is_procedure(object *env, object *args_list)
+static object *prim_is_procedure(object *env, object *args)
 {
-	return make_bool((args_list->car->type == COMPOUND_PROC ||
-			args_list->car->type == PRIM) ? true : false);
+	return make_bool((args->car->type == COMPOUND_PROC ||
+			args->car->type == PRIM) ? true : false);
 }
 
-static object *prim_is_eq(object *env, object *args_list)
+static object *prim_is_eq(object *env, object *args)
 {
 	object *obj;
-	object *first = args_list->car;
-	while (args_list != Nil) {
-		obj = args_list->car;
+	object *first = args->car;
+	for (; args != Nil; args = args->cdr) {
+		obj = args->car;
 		if (obj->type != first->type)
 			return make_bool(false);
 		switch (first->type) {
@@ -623,18 +609,17 @@ static object *prim_is_eq(object *env, object *args_list)
 			if (obj != first)
 				return make_bool(false);
 		}
-		args_list = args_list->cdr;
 	}
 	return make_bool(true);
 }
 
-static object *prim_is_num_eq(object *env, object *args_list)
+static object *prim_is_num_eq(object *env, object *args)
 {
-	int64_t first = args_list->car->int_val;
-	while (args_list != Nil) {
-		if (args_list->car->int_val != first)
+	int64_t first = args->car->int_val;
+	while (args != Nil) {
+		if (args->car->int_val != first)
 			return make_bool(false);
-		args_list = args_list->cdr;
+		args = args->cdr;
 	}
 	return make_bool(true);
 }
@@ -676,26 +661,26 @@ static object *load_file(const char *filename, object *env)
 	return Ok;
 }
 
-static object *prim_eval(object *env, object *args_list)
+static object *prim_eval(object *env, object *args)
 {
-	return eval(env, car(args_list));
+	return eval(env, car(args));
 }
 
-static object *prim_load(object *env, object *args_list)
+static object *prim_load(object *env, object *args)
 {
-	return load_file(car(args_list)->string_val, env);
+	return load_file(car(args)->string_val, env);
 }
 
-static object *prim_display(object *env, object *args_list)
+static object *prim_display(object *env, object *args)
 {
-	if (args_list->car->type == STRING)
-		printf("%s", args_list->car->string_val);
+	if (args->car->type == STRING)
+		printf("%s", args->car->string_val);
 	else
-		object_print(car(args_list));
+		object_print(car(args));
 	return Unspecified;
 }
 
-static object *prim_newline(object *env, object *args_list)
+static object *prim_newline(object *env, object *args)
 {
 	printf("\n");
 	return Ok;
