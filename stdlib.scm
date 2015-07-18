@@ -44,6 +44,15 @@
 
 (define (< x y) (> y x))
 
+(define (less-or-eq-list? elemlist)
+  (if (or (null? elemlist) (null? (cdr elemlist)))
+      #t
+      (if (> (car elemlist) (cadr elemlist))
+          #f
+          (less-or-eq-list? (cdr elemlist)))))
+
+(define (<= . args) (less-or-eq-list? args))
+
 (define (zero? x) (= 0 x))
 
 (define (length items)
