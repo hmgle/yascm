@@ -72,6 +72,18 @@
 (define (>= . args) (greater-or-eq-list? args))
 
 (define (zero? x) (= 0 x))
+(define (positive? x) (> x 0))
+(define (negative? x) (> 0 x))
+
+(define (extremum-list compar-proc maxelem elemlist)
+  (if (null? elemlist)
+      maxelem
+      (if (compar-proc (car elemlist) maxelem)
+          (extremum-list compar-proc (car elemlist) (cdr elemlist))
+          (extremum-list compar-proc maxelem (cdr elemlist)))))
+
+(define (max head . args) (extremum-list > head args))
+(define (min head . args) (extremum-list < head args))
 
 (define (length items)
   (define (length-iter a count)
