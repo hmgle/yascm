@@ -336,7 +336,7 @@
   (newline)
   (display ";testing bignums; ")
   (newline)
-  (section 6 5 5)
+  (SECTION 6 5 5)
   (test 0 modulo -2177452800 86400)
   (test 0 modulo 2177452800 -86400)
   (test 0 modulo 2177452800 86400)
