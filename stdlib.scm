@@ -75,6 +75,15 @@
 (define (positive? x) (> x 0))
 (define (negative? x) (> 0 x))
 
+(define (remainder x y)
+   (- x (* y (quotient x y))))
+
+(define (modulo x y)
+   (cond ((or (and (positive? x) (negative? y))
+              (and (positive? y) (negative? x)))
+                  (if (zero? (remainder x y)) 0 (+ y (remainder x y))))
+         (else (remainder x y))))
+
 (define (extremum-list compar-proc maxelem elemlist)
   (if (null? elemlist)
       maxelem
@@ -84,6 +93,11 @@
 
 (define (max head . args) (extremum-list > head args))
 (define (min head . args) (extremum-list < head args))
+
+(define (abs x)
+   (if (> 0 x)
+       (- x)
+       x))
 
 (define (length items)
   (define (length-iter a count)
