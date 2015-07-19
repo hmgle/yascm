@@ -84,6 +84,23 @@
                   (if (zero? (remainder x y)) 0 (+ y (remainder x y))))
          (else (remainder x y))))
 
+(define (odd? x)
+   (if (zero? (remainder x 2))
+       #f #t))
+(define (even? x) (not (odd? x)))
+
+(define (abs x)
+   (if (> 0 x)
+       (- x)
+       x))
+
+(define (gcd a b)
+   (if (= b 0)
+       (abs a)
+       (abs (gcd b (remainder a b)))))
+
+(define (lcm a b) (quotient (abs (* a b)) (gcd a b)))
+
 (define (extremum-list compar-proc maxelem elemlist)
   (if (null? elemlist)
       maxelem
@@ -93,11 +110,6 @@
 
 (define (max head . args) (extremum-list > head args))
 (define (min head . args) (extremum-list < head args))
-
-(define (abs x)
-   (if (> 0 x)
-       (- x)
-       x))
 
 (define (length items)
   (define (length-iter a count)
