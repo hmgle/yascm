@@ -354,6 +354,11 @@ static object *prim_mul(object *env, object *args)
 	return make_fixnum(ret);
 }
 
+static object *prim_quotient(object *env, object *args)
+{
+	return make_fixnum(args->car->int_val / cadr(args)->int_val);
+}
+
 static object *prim_cons(object *env, object *args)
 {
 	return cons(car(args), cadr(args));
@@ -725,6 +730,7 @@ static void define_prim(object *env)
 	add_primitive(env, "+", prim_plus, PRIM);
 	add_primitive(env, "-", prim_sub, PRIM);
 	add_primitive(env, "*", prim_mul, PRIM);
+	add_primitive(env, "quotient", prim_quotient, PRIM);
 	add_primitive(env, "cons", prim_cons, PRIM);
 	add_primitive(env, "car", prim_car, PRIM);
 	add_primitive(env, "cdr", prim_cdr, PRIM);
