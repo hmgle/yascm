@@ -1,5 +1,4 @@
 ;;;; modify from `r4rstest.scm' Test correctness of scheme implementations.
-
 ;; Copyright (C) 1991, 1992, 1993, 1994, 1995, 2000, 2003, 2004, 2006, 2007 Free Software Foundation, Inc.
 ;;
 ;; This program is free software: you can redistribute it and/or modify
@@ -66,7 +65,7 @@
   (list boolean? char? null? number? pair? procedure? string? symbol?))
 (define type-examples
   (list
-   #t #f #\a '() 9739 '(test) record-error "test" 'test '#() '#(a b c) ))
+   #t #f #\a '() 9739 '(test) record-error "test" "" 'test '#() '#(a b c) ))
 (define i 1)
 (for-each (lambda (x) (display (make-string i #\ ))
 		  (set! i (+ 3 i))
@@ -185,7 +184,7 @@
 (test #t pair? '(a . 1))
 (test #t pair? '(a b c))
 (test #f pair? '())
-(test #f pair? '#(a b))
+(test #f pair? '#(a b)) ; not pass now
 
 (test '(a) cons 'a '())
 (test '((a) b c d) cons '(a) '(b c d))
@@ -240,41 +239,6 @@
 (test #t symbol? 'nil)
 (test #f symbol? '())
 (test #f symbol? #f)
-;;; But first, what case are symbols in?  Determine the standard case:
-(define char-standard-case char-upcase)
-(if (string=? (symbol->string 'A) "a")
-    (set! char-standard-case char-downcase))
-(test #t 'standard-case
-      (string=? (symbol->string 'a) (symbol->string 'A)))
-(test #t 'standard-case
-      (or (string=? (symbol->string 'a) "A")
-	  (string=? (symbol->string 'A) "a")))
-(define (str-copy s)
-  (let ((v (make-string (string-length s))))
-    (do ((i (- (string-length v) 1) (- i 1)))
-	((< i 0) v)
-      (string-set! v i (string-ref s i)))))
-(define (string-standard-case s)
-  (set! s (str-copy s))
-  (do ((i 0 (+ 1 i))
-       (sl (string-length s)))
-      ((>= i sl) s)
-      (string-set! s i (char-standard-case (string-ref s i)))))
-(test (string-standard-case "flying-fish") symbol->string 'flying-fish)
-(test (string-standard-case "martin") symbol->string 'Martin)
-(test "Malvina" symbol->string (string->symbol "Malvina"))
-(test #t 'standard-case (eq? 'a 'A))
-
-(define x (string #\a #\b))
-(define y (string->symbol x))
-(string-set! x 0 #\c)
-(test "cb" 'string-set! x)
-(test "ab" symbol->string y)
-(test y string->symbol "ab")
-
-(test #t eq? 'mISSISSIppi 'mississippi)
-(test #f 'string->symbol (eq? 'bitBlt (string->symbol "bitBlt")))
-(test 'JollyWog string->symbol (symbol->string 'JollyWog))
 
 (SECTION 6 5 5)
 (test #t number? 3)
