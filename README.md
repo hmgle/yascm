@@ -120,6 +120,32 @@ welcome
 55
 ```
 
+- [The Metacircular Evaluator](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1)
+
+```
+$ ./yascm 
+; loading stdlib.scm
+; done loading stdlib.scm
+welcome
+> (load "examples/mceval.scm")
+; loading examples/mceval.scm
+; done loading examples/mceval.scm
+; ok
+> (driver-loop)
+
+;;; M-Eval input:
+(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1))))))
+
+;;; M-Eval value:
+ok
+
+;;; M-Eval input:
+(fact 5)
+
+;;; M-Eval value:
+120
+```
+
 - [Quine](https://en.wikipedia.org/wiki/Quine_%28computing%29)
 
 ```
