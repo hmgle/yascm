@@ -56,7 +56,8 @@ extern int yydebug;
     CHAR_T = 266,
     STRING_T = 267,
     DOUBLE_QUOTE = 268,
-    SYMBOL_T = 269
+    SYMBOL_T = 269,
+    END_OF_FILE = 270
   };
 #endif
 
@@ -65,7 +66,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 11 "yascm_bison.y" /* yacc.c:1909  */
+#line 30 "yascm_bison.y" /* yacc.c:1909  */
 
 	struct object_s *var;
 	int64_t n;
@@ -73,7 +74,7 @@ union YYSTYPE
 	char c;
 	char *s;
 
-#line 77 "yascm_bison.tab.h" /* yacc.c:1909  */
+#line 78 "yascm_bison.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

@@ -8,7 +8,7 @@ Yet Another Scheme Interpreter.
 make
 ```
 
-## Example
+## Examples
 
 - Recursion
 
@@ -16,7 +16,7 @@ make
 $ ./yascm
 welcome
 > (define (sum x)
-  (if (= 0 x) 0 (+ x (sum (+ x -1)))))
+    (if (= 0 x) 0 (+ x (sum (- x 1)))))
 ; ok
 > (sum 10000)
 50005000
@@ -29,7 +29,7 @@ welcome
 $ ./yascm
 welcome
 > (define (add a)
- (lambda (b) (+ a b)))
+    (lambda (b) (+ a b)))
 ; ok
 > (define add3 (add 3))
 ; ok
@@ -52,14 +52,14 @@ welcome
 >
 ```
 
-- [man or boy test](https://en.wikipedia.org/?title=Man_or_boy_test):
+- [Man or boy test](https://en.wikipedia.org/?title=Man_or_boy_test)
 
 ```
 $ ./yascm
 welcome
 > (define (A k x1 x2 x3 x4 x5)
     (define (B)
-      (set! k (+ k -1))
+      (set! k (- k 1))
       (A k B x1 x2 x3 x4))
     (if (> 1 k)
         (+ (x4) (x5))
@@ -70,10 +70,76 @@ welcome
 > 
 ```
 
-## Author
+- [Y combinator](http://rosettacode.org/wiki/Y_combinator#Scheme)
 
-hmgle <dustgle@gmail.com>
+```
+$ ./yascm
+; loading stdlib.scm
+; done loading stdlib.scm
+welcome
+> (define Y
+    (lambda (h)
+      ((lambda (x) (x x))
+       (lambda (g)
+         (h (lambda args (apply (g g) args)))))))
+; ok
+> (define fib
+    (Y
+      (lambda (f)
+        (lambda (x)
+          (if (> 2 x)
+              x
+              (+ (f (- x 1)) (f (- x 2))))))))
+; ok
+> (fib 10)
+55
+```
+
+- [The Metacircular Evaluator](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1)
+
+```
+$ ./yascm 
+; loading stdlib.scm
+; done loading stdlib.scm
+welcome
+> (load "examples/mceval.scm")
+; loading examples/mceval.scm
+; done loading examples/mceval.scm
+; ok
+> (driver-loop)
+
+;;; M-Eval input:
+(define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1))))))
+
+;;; M-Eval value:
+ok
+
+;;; M-Eval input:
+(fact 5)
+
+;;; M-Eval value:
+120
+```
+
+- [Quine](https://en.wikipedia.org/wiki/Quine_%28computing%29)
+
+```
+$ ./yascm 
+; loading stdlib.scm
+; done loading stdlib.scm
+welcome
+> ((lambda (x)
+      (list x (list (quote quote) x)))
+    (quote
+      (lambda (x)
+        (list x (list (quote quote) x)))))
+```
+
+## Authors
+
+- Created by hmgle <dustgle@gmail.com>
+- [Contributors](https://github.com/hmgle/yascm/graphs/contributors)
 
 ## LICENSE
 
-GPL Version 3, see the COPYING file included in the source distribution.
+GPL Version 3, see the [COPYING](COPYING) file included in the source distribution.
