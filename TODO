@@ -1,0 +1,4 @@
+* garbage collection.
+* check object type and args length.
+* error handle.
+* support r4rs?
