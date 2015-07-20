@@ -374,6 +374,20 @@ static object *prim_cdr(object *env, object *args)
 	return cdar(args);
 }
 
+static object *prim_set_car(object *env, object *args)
+{
+	object *pair = car(args);
+	pair->car = cadr(args);
+	return Unspecified;
+}
+
+static object *prim_set_cdr(object *env, object *args)
+{
+	object *pair = car(args);
+	pair->cdr = cadr(args);
+	return Unspecified;
+}
+
 static object *prim_list(object *env, object *args)
 {
 	return args;
@@ -699,6 +713,13 @@ static object *prim_load(object *env, object *args)
 	return load_file(car(args)->string_val, env);
 }
 
+static object *prim_read(object *env, object *args)
+{
+	object *obj;
+	yyparse(&obj);
+	return obj;
+}
+
 static object *prim_display(object *env, object *args)
 {
 	if (args->car->type == STRING)
@@ -734,6 +755,8 @@ static void define_prim(object *env)
 	add_primitive(env, "cons", prim_cons, PRIM);
 	add_primitive(env, "car", prim_car, PRIM);
 	add_primitive(env, "cdr", prim_cdr, PRIM);
+	add_primitive(env, "set-car!", prim_set_car, PRIM);
+	add_primitive(env, "set-cdr!", prim_set_cdr, PRIM);
 	add_primitive(env, "list", prim_list, PRIM);
 	add_primitive(env, "null?", prim_is_null, PRIM);
 	add_primitive(env, "boolean?", prim_is_boolean, PRIM);
@@ -748,6 +771,7 @@ static void define_prim(object *env)
 	add_primitive(env, ">", prim_is_num_gt, PRIM);
 	add_primitive(env, "eval", prim_eval, PRIM);
 	add_primitive(env, "load", prim_load, PRIM);
+	add_primitive(env, "read", prim_read, PRIM);
 	add_primitive(env, "display", prim_display, PRIM);
 	add_primitive(env, "newline", prim_newline, PRIM);
 }
