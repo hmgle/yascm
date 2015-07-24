@@ -1,5 +1,7 @@
 # yascm
 
+[![Build Status](https://travis-ci.org/hmgle/yascm.png?branch=no-flex-bison)](https://travis-ci.org/hmgle/yascm)
+
 Yet Another Scheme Interpreter.
 
 ## Building
