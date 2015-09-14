@@ -299,7 +299,7 @@ void object_print(const object *obj)
 		if (obj == Nil)
 			printf("()");
 		else if (obj == Ok)
-			fprintf(stderr, "; ok");
+			printf("; ok");
 		else if (obj == Unspecified)
 			(void)0;
 		else
@@ -800,7 +800,8 @@ int main(int argc, char **argv)
 	while (NOT_END) {
 		yyparse(&obj);
 		object_print(eval(genv, obj));
-		printf("\n> ");
+		fflush(stdout);
+		fprintf(stderr, "\n> ");
 	}
 	return 0;
 }
