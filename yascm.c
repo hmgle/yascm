@@ -800,6 +800,7 @@ int main(int argc, char **argv)
 	while (NOT_END) {
 		yyparse(&obj);
 		object_print(eval(genv, obj));
+		printf("\n");
 		fflush(stdout);
 		fprintf(stderr, "\n> ");
 	}
