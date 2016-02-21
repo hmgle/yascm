@@ -160,6 +160,12 @@ welcome
         (list x (list (quote quote) x)))))
 ```
 
+## Testing
+
+```
+$ make test
+```
+
 ## Authors
 
 - Created by hmgle <dustgle@gmail.com>
