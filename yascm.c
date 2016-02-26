@@ -270,7 +270,7 @@ void object_print(const object *obj)
 		printf("%ld", obj->int_val);
 		break;
 	case KEYWORD:
-		printf("<keywork>");
+		printf("<keyword>");
 		break;
 	case PRIM:
 		printf("<primitive>");
