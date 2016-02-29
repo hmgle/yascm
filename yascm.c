@@ -219,7 +219,7 @@ object *eval(object *env, object *obj)
 	object *fn, *args;
 	object *newenv, *newobj;
 	object *eval_args;
-	if (obj == Nil) return Nil;
+	if (obj == NULL) return NULL;
 	switch (obj->type) {
 	case SYMBOL:
 		bind = lookup_variable_val(obj, env);
@@ -241,9 +241,8 @@ object *eval(object *env, object *obj)
 		} else {
 			return obj; /* list */
 		}
-	default:
-		return obj;
 	}
+	return obj;
 }
 
 static void pair_print(const object *pair)
