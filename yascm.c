@@ -121,6 +121,13 @@ object *make_fixnum(int64_t val)
 	return obj;
 }
 
+object *make_floatnum(long double val)
+{
+	object *obj = create_object(FLOATNUM);
+	obj->float_val = val;
+	return obj;
+}
+
 object *make_emptylist(void)
 {
 	return Nil;
@@ -267,6 +274,9 @@ void object_print(const object *obj)
 	case FIXNUM:
 		printf("%ld", obj->int_val);
 		break;
+	case FLOATNUM:
+		printf("%LF", obj->float_val);
+		break;    
 	case KEYWORD:
 		printf("<keyword>");
 		break;
@@ -316,10 +326,15 @@ static void add_primitive(object *env, char *name, Primitive *func,
 
 static object *prim_plus(object *env, object *args)
 {
-	int64_t ret;
-	for (ret = 0; args != Nil; args = args->cdr)
-		ret += (car(args)->int_val);
-	return make_fixnum(ret);
+	long double ret;
+  object_type type = FIXNUM;
+	for (ret = 0; args != Nil; args = args->cdr) {
+    ret += getval(car(args));
+    if(car(args)->type == FLOATNUM) {
+      type = FLOATNUM;
+    }
+  }
+  return make_numval(ret, type);
 }
 
 static int list_length(object *list)
@@ -333,28 +348,87 @@ static int list_length(object *list)
 	}
 }
 
+object *make_numval(long double val, object_type type)
+{
+  object *obj = NULL;
+  
+  if(type == FIXNUM) {
+  	obj = create_object(FIXNUM);
+  	obj->int_val = val;
+  } else if(type == FLOATNUM) {
+  	obj = create_object(FLOATNUM);
+  	obj->float_val = val;
+  }
+
+	return obj;
+}
+
+object *make_numobj(object* val)
+{
+  object *obj = NULL;
+  
+  if(val->type == FIXNUM) {
+  	obj = create_object(FIXNUM);
+  	obj->int_val = val->int_val;
+  } else if(val->type == FLOATNUM) {
+  	obj = create_object(FLOATNUM);
+  	obj->float_val = val->float_val;
+  }
+
+	return obj;
+}
+
+long double getval(object* val) 
+{
+  if(val->type == FIXNUM) {
+    return val->int_val;
+  } else if(val->type == FLOATNUM) {
+    return val->float_val;
+  }
+}
+
 static object *prim_sub(object *env, object *args)
 {
-	int64_t ret;
+	long double ret;
+  object_type type = FIXNUM;
+  ret = getval(car(args));
+  if(car(args)->type == FLOATNUM) {
+    type = FLOATNUM;
+  }  
 	if (list_length(args) == 1)
-		return make_fixnum(-car(args)->int_val);
-	ret = car(args)->int_val;
-	for (args = args->cdr; args != Nil; args = args->cdr)
-		ret -= (car(args)->int_val);
-	return make_fixnum(ret);
+		ret = -ret;  
+	for (args = args->cdr; args != Nil; args = args->cdr) {
+    ret -= getval(car(args));
+    if(car(args)->type == FLOATNUM) {
+      type = FLOATNUM;
+    }
+  }
+  return make_numval(ret, type);
 }
 
 static object *prim_mul(object *env, object *args)
 {
-	int64_t ret;
-	for (ret = 1; args != Nil; args = args->cdr)
-		ret *= (car(args)->int_val);
-	return make_fixnum(ret);
+	long double ret;
+  object_type type = FIXNUM;
+	for (ret = 1; args != Nil; args = args->cdr) {
+    ret *= getval(car(args));
+    if(car(args)->type == FLOATNUM) {
+      type = FLOATNUM;
+    }
+  }
+  return make_numval(ret, type);
 }
 
 static object *prim_quotient(object *env, object *args)
 {
-	return make_fixnum(args->car->int_val / cadr(args)->int_val);
+  long double ret = getval(args->car) / getval(cadr(args));
+  object_type type = FIXNUM;
+  if(args->car->type == FLOATNUM || cadr(args)->type == FLOATNUM) {
+    type = FLOATNUM;
+  } else {
+    type = FIXNUM;
+  }
+	return make_numval(ret, type);
 }
 
 static object *prim_cons(object *env, object *args)

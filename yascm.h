@@ -84,6 +84,7 @@ object *make_bool(bool val);
 object *make_char(char val);
 object *make_string(const char *val);
 object *make_fixnum(int64_t val);
+object *make_floatnum(long double val);
 object *make_emptylist(void);
 object *make_symbol(const char *name);
 object *make_quote(object *obj);
@@ -92,5 +93,8 @@ object *make_env(object *var, object *up);
 object *eval(object *env, object *obj);
 void object_print(const object *obj);
 void eof_handle(void);
+long double getval(object* val);
+object *make_numval(long double val, object_type type);
+object *make_numobj(object* val);
 
 #endif

@@ -50,7 +50,8 @@ void yyerror(struct object_s **obj, const char *s);
 
 %type <s> string
 %type <var> object
-%type <n> number
+%type <n> inumber
+%type <d> fnumber
 %type <var> emptylist
 %type <var> quote_list
 %type <var> pair
@@ -69,8 +70,8 @@ exp: object {*obj = $1; YYACCEPT;}
 string: DOUBLE_QUOTE STRING_T DOUBLE_QUOTE {$$ = $2;}
       | DOUBLE_QUOTE DOUBLE_QUOTE {$$ = "\"";}
 
-number: FIXNUM_T {$$ = $1;}
-      | FLOATNUM_T {printf("float: not support now\n");}
+inumber: FIXNUM_T {$$ = $1;}
+fnumber: FLOATNUM_T {$$ = $1;}
 
 emptylist: LP RP 
 
@@ -88,7 +89,8 @@ list: LP list_end {$$ = $2;}
 
 object: TRUE_T		{$$ = make_bool(true);}
       | FALSE_T		{$$ = make_bool(false);}
-      | number		{$$ = make_fixnum($1);}
+      | inumber		{$$ = make_fixnum($1);}
+      | fnumber		{$$ = make_floatnum($1);}
       | CHAR_T		{$$ = make_char($1);}
       | string		{$$ = make_string($1);}
       | SYMBOL_T	{$$ = make_symbol($1);}

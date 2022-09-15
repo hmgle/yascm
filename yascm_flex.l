@@ -49,7 +49,10 @@ CHAR_VAL (newline|space|[^{WS}]|x[0-9A-F]+)
 	yylval.n = strtoll(yytext, NULL, 10);
 	return FIXNUM_T;
 }
-[-]?{DIG}?"."{DIG}	{return FLOATNUM_T;}
+[-]?{DIG}?"."{DIG}	{
+  yylval.d = strtod(yytext, NULL);
+  return FLOATNUM_T;
+}
 
 #\\	{BEGIN(EXPECT_CHAR);}
 <EXPECT_CHAR>{CHAR_VAL} {
