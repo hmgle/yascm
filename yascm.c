@@ -23,6 +23,7 @@
 
 extern FILE *yyin;
 int yyparse(struct object_s **env);
+void yyrestart(FILE *input_file);
 
 object *Nil;
 object *Else;

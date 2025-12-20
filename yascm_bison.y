@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include "yascm.h"
 
+int yylex(void);
 void yyerror(struct object_s **obj, const char *s);
 %}
 
