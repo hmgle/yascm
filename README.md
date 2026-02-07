@@ -1,6 +1,6 @@
 # yascm
 
-[![Build Status](https://travis-ci.org/hmgle/yascm.png?branch=master)](https://travis-ci.org/hmgle/yascm)
+[![CI](https://github.com/hmgle/yascm/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/hmgle/yascm/actions/workflows/ci.yml)
 
 Yet Another Scheme Interpreter.
 
