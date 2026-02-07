@@ -627,48 +627,17 @@ static object *prim_cond(object *env, object *args)
 	return Unspecified;
 }
 
-static object *prim_is_null(object *env, object *args)
-{
-	return make_bool(args->car == Nil);
-}
-
-static object *prim_is_boolean(object *env, object *args)
-{
-	return make_bool(args->car->type == BOOL);
-}
-
-static object *prim_is_pair(object *env, object *args)
-{
-	return make_bool(args->car->type == PAIR);
-}
-
-static object *prim_is_symbol(object *env, object *args)
-{
-	return make_bool(args->car->type == SYMBOL);
-}
-
-static object *prim_is_number(object *env, object *args)
-{
-	return make_bool(args->car->type == FIXNUM ||
-			 args->car->type == FLOATNUM);
-}
-
-static object *prim_is_char(object *env, object *args)
-{
-	return make_bool(args->car->type == CHAR);
-}
-
-static object *prim_is_string(object *env, object *args)
-{
-	return make_bool(args->car->type == STRING);
-}
-
-static object *prim_is_procedure(object *env, object *args)
-{
-	return make_bool(args->car->type == COMPOUND_PROC ||
-			 args->car->type == PRIM ||
-			 args->car->type == CONTINUATION);
-}
+#define DEF_PRED(fn, expr) \
+	static object *fn(object *env, object *args) { (void)env; return make_bool((expr)); }
+DEF_PRED(prim_is_null, args->car == Nil)
+DEF_PRED(prim_is_boolean, args->car->type == BOOL)
+DEF_PRED(prim_is_pair, args->car->type == PAIR)
+DEF_PRED(prim_is_symbol, args->car->type == SYMBOL)
+DEF_PRED(prim_is_number, args->car->type == FIXNUM || args->car->type == FLOATNUM)
+DEF_PRED(prim_is_char, args->car->type == CHAR)
+DEF_PRED(prim_is_string, args->car->type == STRING)
+DEF_PRED(prim_is_procedure, args->car->type == COMPOUND_PROC || args->car->type == PRIM || args->car->type == CONTINUATION)
+#undef DEF_PRED
 
 static object *prim_is_eq(object *env, object *args)
 {
