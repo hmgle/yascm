@@ -47,6 +47,7 @@ typedef enum {
 	KEYWORD,
 	PRIM,
 	COMPOUND_PROC,
+	CONTINUATION,
 	ENV,
 	OTHER,
 } object_type;
