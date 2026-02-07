@@ -92,7 +92,7 @@ welcome
 ; ok
 > (A 10 (lambda () 1) (lambda () -1) (lambda () -1) (lambda () 1) (lambda () 0))
 -67
-> 
+>
 ```
 
 - [Y combinator](http://rosettacode.org/wiki/Y_combinator#Scheme)
@@ -123,7 +123,7 @@ welcome
 - [The Metacircular Evaluator](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-26.html#%_sec_4.1)
 
 ```
-$ ./yascm 
+$ ./yascm
 ; loading stdlib.scm
 ; done loading stdlib.scm
 welcome
@@ -149,7 +149,7 @@ ok
 - [Quine](https://en.wikipedia.org/wiki/Quine_%28computing%29)
 
 ```
-$ ./yascm 
+$ ./yascm
 ; loading stdlib.scm
 ; done loading stdlib.scm
 welcome
@@ -160,10 +160,16 @@ welcome
         (list x (list (quote quote) x)))))
 ```
 
+## Continuations
+
+`call-with-current-continuation` (alias `call/cc`) is supported as an
+escape-only continuation: the captured continuation is only valid within the
+dynamic extent of the `call/cc` call.
+
 ## Testing
 
 ```
-$ make test
+make test
 ```
 
 ## Authors

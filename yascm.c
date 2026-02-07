@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
 #include "yascm.h"
 
 extern FILE *yyin;
@@ -40,6 +41,13 @@ static object TRUE = {
 static object *Symbol_table;
 static bool NOT_END = true;
 
+typedef struct continuation_object_s {
+	object base;
+	jmp_buf jb;
+	bool valid;
+	object *value;
+} continuation_object;
+
 void eof_handle(void)
 {
 	NOT_END = false;
@@ -54,6 +62,19 @@ static object *create_object(int type)
 	}
 	obj->type = type;
 	return obj;
+}
+
+static object *make_continuation(void)
+{
+	continuation_object *cont = calloc(1, sizeof(*cont));
+	if (cont == NULL) {
+		fprintf(stderr, "calloc fail!\n");
+		exit(1);
+	}
+	cont->base.type = CONTINUATION;
+	cont->valid = true;
+	cont->value = Unspecified;
+	return (object *)cont;
 }
 
 static object *car(object *pair)
@@ -195,6 +216,15 @@ static object *apply(object *env, object *fn, object *args)
 	if (fn->type == PRIM) {
 		eval_args = list_of_val(args, env);
 		return fn->func(env, eval_args);
+	} else if (fn->type == CONTINUATION) {
+		continuation_object *cont = (continuation_object *)fn;
+		eval_args = list_of_val(args, env);
+		if (eval_args == Nil || eval_args->cdr != Nil)
+			DIE("continuation expects exactly 1 argument");
+		if (!cont->valid)
+			DIE("invalid continuation (dynamic extent ended)");
+		cont->value = car(eval_args);
+		longjmp(cont->jb, 1);
 	} else if (fn->type == KEYWORD) {
 		return fn->func(env, args);
 	}
@@ -236,7 +266,8 @@ object *eval(object *env, object *obj)
 	case PAIR:
 		fn = eval(env, obj->car);
 		args = obj->cdr;
-		if (fn->type == PRIM || fn->type == KEYWORD) {
+		if (fn->type == PRIM || fn->type == KEYWORD ||
+		    fn->type == CONTINUATION) {
 			return apply(env, fn, args);
 		} else if (fn->type == COMPOUND_PROC) {
 			eval_args = list_of_val(args, env);
@@ -303,6 +334,9 @@ void object_print(const object *obj)
 		break;
 	case COMPOUND_PROC:
 		printf("<proc>");
+		break;
+	case CONTINUATION:
+		printf("<continuation>");
 		break;
 	default:
 		if (obj == Nil)
@@ -688,7 +722,8 @@ static object *prim_is_string(object *env, object *args)
 static object *prim_is_procedure(object *env, object *args)
 {
 	return make_bool((args->car->type == COMPOUND_PROC ||
-			args->car->type == PRIM) ? true : false);
+			args->car->type == PRIM ||
+			args->car->type == CONTINUATION) ? true : false);
 }
 
 static object *prim_is_eq(object *env, object *args)
@@ -808,6 +843,38 @@ static object *prim_newline(object *env, object *args)
 	return Ok;
 }
 
+static object *prim_callcc(object *env, object *args)
+{
+	object *proc;
+	object *k;
+	continuation_object *cont;
+	int jmpret;
+	object *expr;
+	object *ret;
+
+	if (list_length(args) != 1)
+		DIE("call/cc expects exactly 1 argument");
+
+	proc = car(args);
+	if (!(proc->type == PRIM || proc->type == COMPOUND_PROC ||
+	      proc->type == CONTINUATION))
+		DIE("call/cc expects a procedure");
+
+	k = make_continuation();
+	cont = (continuation_object *)k;
+	jmpret = setjmp(cont->jb);
+	if (jmpret == 0) {
+		expr = cons(proc, cons(k, Nil));
+		ret = eval(env, expr);
+		cont->valid = false;
+		return ret;
+	}
+
+	ret = cont->value;
+	cont->valid = false;
+	return ret;
+}
+
 static void define_prim(object *env)
 {
 	add_primitive(env, "define", prim_define, KEYWORD);
@@ -847,6 +914,8 @@ static void define_prim(object *env)
 	add_primitive(env, "read", prim_read, PRIM);
 	add_primitive(env, "display", prim_display, PRIM);
 	add_primitive(env, "newline", prim_newline, PRIM);
+	add_primitive(env, "call-with-current-continuation", prim_callcc, PRIM);
+	add_primitive(env, "call/cc", prim_callcc, PRIM);
 }
 
 object *make_env(object *var, object *up)

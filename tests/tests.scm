@@ -387,8 +387,11 @@
 (test #f procedure? 'car)
 (test #t procedure? (lambda (x) (* x x)))
 (test #f procedure? '(lambda (x) (* x x)))
-;; no support call-with-current-continuation now
-; (test #t call-with-current-continuation procedure?)
+;; continuations (escape-only call/cc support)
+(test #t procedure? call/cc)
+(test #t call-with-current-continuation procedure?)
+(test #t 'call/cc (call-with-current-continuation (lambda (k) (procedure? k))))
+(test 42 'call/cc (call/cc (lambda (k) (k 42))))
 (test 7 apply + (list 3 4))
 (test 7 apply (lambda (a b) (+ a b)) (list 3 4))
 ; (test 17 apply + 10 (list 3 4))
@@ -402,11 +405,11 @@
 ;; 		(for-each (lambda (i) (vector-set! v i (* i i)))
 ;; 			'(0 1 2 3 4))
 ;; 		v))
-; (test -3 call-with-current-continuation
-; 		(lambda (exit)
-; 		 (for-each (lambda (x) (if (negative? x) (exit x)))
-; 		 	'(54 0 37 -3 245 19))
-; 		#t))
+(test -3 call-with-current-continuation
+		(lambda (exit)
+		 (for-each (lambda (x) (if (negative? x) (exit x)))
+		 	'(54 0 37 -3 245 19))
+		#t))
 ; (define list-length
 ;  (lambda (obj)
 ;   (call-with-current-continuation
@@ -518,4 +521,3 @@
 (display "(test-cont) (test-sc4) (test-delay)")
 (newline)
 "last item in file"
-
