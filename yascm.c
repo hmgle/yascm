@@ -56,10 +56,8 @@ void eof_handle(void)
 static object *create_object(int type)
 {
 	object *obj = calloc(1, sizeof(*obj));
-	if (obj == NULL) {
-		fprintf(stderr, "calloc fail!\n");
-		exit(1);
-	}
+	if (!obj)
+		DIE("calloc fail");
 	obj->type = type;
 	return obj;
 }
@@ -67,10 +65,8 @@ static object *create_object(int type)
 static object *make_continuation(void)
 {
 	continuation_object *cont = calloc(1, sizeof(*cont));
-	if (cont == NULL) {
-		fprintf(stderr, "calloc fail!\n");
-		exit(1);
-	}
+	if (!cont)
+		DIE("calloc fail");
 	cont->base.type = CONTINUATION;
 	cont->valid = true;
 	cont->value = Unspecified;
@@ -247,7 +243,7 @@ object *extend_env(object *vars, object *vals, object *base_env)
 
 static bool is_the_last_arg(object *args)
 {
-	return (args->cdr == Nil) ? true : false;
+	return args->cdr == Nil;
 }
 
 object *eval(object *env, object *obj)
@@ -359,110 +355,84 @@ static void add_primitive(object *env, char *name, Primitive *func,
 	add_variable(env, sym, prim);
 }
 
-static object *prim_plus(object *env, object *args)
+static object *num_fold(object *args, long double init, char op)
 {
-	long double ret;
+	long double ret = init;
 	object_type type = FIXNUM;
-	for (ret = 0; args != Nil; args = args->cdr) {
-		ret += getval(car(args));
-		if(car(args)->type == FLOATNUM) {
+	for (; args != Nil; args = args->cdr) {
+		object *arg = args->car;
+		ret = (op == '*') ? (ret * getval(arg)) : (ret + getval(arg));
+		if (arg->type == FLOATNUM)
 			type = FLOATNUM;
-		}
 	}
 	return make_numval(ret, type);
 }
 
-static int list_length(object *list)
-{
-	int len = 0;
-	for (;;) {
-		if (list == Nil)
-			return len;
-		list = list->cdr;
-		len++;
-	}
-}
-
 object *make_numval(long double val, object_type type)
 {
-	object *obj = NULL;
-
-	if(type == FIXNUM) {
-		obj = create_object(FIXNUM);
+	if (type != FIXNUM && type != FLOATNUM)
+		return NULL;
+	object *obj = create_object(type);
+	if (type == FIXNUM)
 		obj->int_val = val;
-	} else if(type == FLOATNUM) {
-		obj = create_object(FLOATNUM);
+	else
 		obj->float_val = val;
-	}
-
 	return obj;
 }
 
-object *make_numobj(object* val)
+object *make_numobj(object *val)
 {
-	object *obj = NULL;
-
-	if(val->type == FIXNUM) {
-		obj = create_object(FIXNUM);
+	if (val->type != FIXNUM && val->type != FLOATNUM)
+		return NULL;
+	object *obj = create_object(val->type);
+	if (val->type == FIXNUM)
 		obj->int_val = val->int_val;
-	} else if(val->type == FLOATNUM) {
-		obj = create_object(FLOATNUM);
+	else
 		obj->float_val = val->float_val;
-	}
-
 	return obj;
 }
 
-long double getval(object* val)
+long double getval(object *val)
 {
-	if(val->type == FIXNUM) {
+	if (val->type == FIXNUM)
 		return val->int_val;
-	} else if(val->type == FLOATNUM) {
+	if (val->type == FLOATNUM)
 		return val->float_val;
-	}
+	DIE("not a number");
+	return 0;
+}
+
+static object *prim_plus(object *env, object *args)
+{
+	return num_fold(args, 0, '+');
 }
 
 static object *prim_sub(object *env, object *args)
 {
-	long double ret;
-	object_type type = FIXNUM;
-	ret = getval(car(args));
-	if(car(args)->type == FLOATNUM) {
-		type = FLOATNUM;
-	}
-	if (list_length(args) == 1)
-		ret = -ret;
+	object *first = car(args);
+	long double ret = getval(first);
+	object_type type = (first->type == FLOATNUM) ? FLOATNUM : FIXNUM;
+	if (args->cdr == Nil)
+		return make_numval(-ret, type);
 	for (args = args->cdr; args != Nil; args = args->cdr) {
-		ret -= getval(car(args));
-		if(car(args)->type == FLOATNUM) {
+		object *arg = car(args);
+		ret -= getval(arg);
+		if (arg->type == FLOATNUM)
 			type = FLOATNUM;
-		}
 	}
 	return make_numval(ret, type);
 }
 
 static object *prim_mul(object *env, object *args)
 {
-	long double ret;
-	object_type type = FIXNUM;
-	for (ret = 1; args != Nil; args = args->cdr) {
-		ret *= getval(car(args));
-		if(car(args)->type == FLOATNUM) {
-			type = FLOATNUM;
-		}
-	}
-	return make_numval(ret, type);
+	return num_fold(args, 1, '*');
 }
 
 static object *prim_quotient(object *env, object *args)
 {
 	long double ret = getval(args->car) / getval(cadr(args));
-	object_type type = FIXNUM;
-	if(args->car->type == FLOATNUM || cadr(args)->type == FLOATNUM) {
-		type = FLOATNUM;
-	} else {
-		type = FIXNUM;
-	}
+	object_type type = (args->car->type == FLOATNUM ||
+			    cadr(args)->type == FLOATNUM) ? FLOATNUM : FIXNUM;
 	return make_numval(ret, type);
 }
 
@@ -502,25 +472,9 @@ static object *prim_list(object *env, object *args)
 
 static object *prim_quote(object *env, object *args)
 {
-	if (list_length(args) != 1)
+	if (args == Nil || args->cdr != Nil)
 		DIE("quote");
 	return args->car;
-}
-
-static object *def_var(object *args)
-{
-	if (args->car->type == SYMBOL)
-		return car(args);
-	else /* PAIR */
-		return caar(args);
-}
-
-static object *def_val(object *args, object *env)
-{
-	if (car(args)->type == PAIR)
-		return make_function(cdar(args), cdr(args), env);
-	else
-		return eval(env, cadr(args));
 }
 
 static void define_variable(object *var, object *val, object *env)
@@ -536,16 +490,6 @@ static void define_variable(object *var, object *val, object *env)
 	add_variable(env, var, val);
 }
 
-static object *set_var(object *args)
-{
-	return car(args);
-}
-
-static object *set_val(object *args)
-{
-	return cadr(args);
-}
-
 static void set_var_val(object *var, object *val, object *env)
 {
 	object *oldvar = lookup_variable_val(var, env);
@@ -556,7 +500,11 @@ static void set_var_val(object *var, object *val, object *env)
 
 static object *prim_define(object *env, object *args)
 {
-	define_variable(def_var(args), def_val(args, env), env);
+	object *var = (car(args)->type == SYMBOL) ? car(args) : caar(args);
+	object *val = (car(args)->type == PAIR) ?
+		make_function(cdar(args), cdr(args), env) :
+		eval(env, cadr(args));
+	define_variable(var, val, env);
 	return Ok;
 }
 
@@ -586,17 +534,13 @@ static object *prim_let(object *env, object *args)
 
 static object *prim_set(object *env, object *args)
 {
-	set_var_val(set_var(args), eval(env, set_val(args)), env);
+	set_var_val(car(args), eval(env, cadr(args)), env);
 	return Ok;
 }
 
 static bool is_false(object *obj)
 {
-	if (obj->type != BOOL)
-		return false;
-	if (obj->bool_val != false)
-		return false;
-	return true;
+	return obj->type == BOOL && !obj->bool_val;
 }
 
 static bool is_true(object *obj)
@@ -653,7 +597,7 @@ static object *prim_if(object *env, object *args)
 
 static bool is_else(object *sym)
 {
-	return (sym == Else) ? true : false;
+	return sym == Else;
 }
 
 static object *eval_args_list(object *env, object *args_list)
@@ -685,45 +629,45 @@ static object *prim_cond(object *env, object *args)
 
 static object *prim_is_null(object *env, object *args)
 {
-	return make_bool((args->car == Nil) ? true : false);
+	return make_bool(args->car == Nil);
 }
 
 static object *prim_is_boolean(object *env, object *args)
 {
-	return make_bool((args->car->type == BOOL) ? true : false);
+	return make_bool(args->car->type == BOOL);
 }
 
 static object *prim_is_pair(object *env, object *args)
 {
-	return make_bool((args->car->type == PAIR) ? true : false);
+	return make_bool(args->car->type == PAIR);
 }
 
 static object *prim_is_symbol(object *env, object *args)
 {
-	return make_bool((args->car->type == SYMBOL) ? true : false);
+	return make_bool(args->car->type == SYMBOL);
 }
 
 static object *prim_is_number(object *env, object *args)
 {
-	return make_bool((args->car->type == FIXNUM ||
-			args->car->type == FLOATNUM) ? true : false);
+	return make_bool(args->car->type == FIXNUM ||
+			 args->car->type == FLOATNUM);
 }
 
 static object *prim_is_char(object *env, object *args)
 {
-	return make_bool((args->car->type == CHAR) ? true : false);
+	return make_bool(args->car->type == CHAR);
 }
 
 static object *prim_is_string(object *env, object *args)
 {
-	return make_bool((args->car->type == STRING) ? true : false);
+	return make_bool(args->car->type == STRING);
 }
 
 static object *prim_is_procedure(object *env, object *args)
 {
-	return make_bool((args->car->type == COMPOUND_PROC ||
-			args->car->type == PRIM ||
-			args->car->type == CONTINUATION) ? true : false);
+	return make_bool(args->car->type == COMPOUND_PROC ||
+			 args->car->type == PRIM ||
+			 args->car->type == CONTINUATION);
 }
 
 static object *prim_is_eq(object *env, object *args)
@@ -852,7 +796,7 @@ static object *prim_callcc(object *env, object *args)
 	object *expr;
 	object *ret;
 
-	if (list_length(args) != 1)
+	if (args == Nil || args->cdr != Nil)
 		DIE("call/cc expects exactly 1 argument");
 
 	proc = car(args);
